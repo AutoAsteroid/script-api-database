@@ -82,7 +82,7 @@ export default class Database {
             const chunk = serialized.slice(i, i + 32767);
             this.target.setDynamicProperty(key, chunk);
         }
-        return DATABASE_CACHE[this.targetId][name] = data;
+        return DATABASE_CACHE[this.id][name] = data;
     }
 
     /**
@@ -123,7 +123,7 @@ export default class Database {
  * Attach a self-overwriting lazy getter to Entity and World prototypes for seemless usage:
  */
 
-for (const Prototype of [ Entity.prototype, World.prototype ]) {
+for (const Prototype of [ Entity.prototype, world ]) {
     /**
      * LAZY INITIALIZATION & INSTANCE OVERWRITE (Runs ONLY ONCE per object instance):
      * 
