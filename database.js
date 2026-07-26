@@ -1,4 +1,4 @@
-import { world, system, Entity } from "@minecraft/server";
+import { world, Entity } from "@minecraft/server";
 
 /**
  * This cache will hold our data from our database calls in memory to avoid unneeded reparsing
