@@ -15,6 +15,16 @@ A high-performance, light-memory database wrapper for Minecraft Bedrock's Script
 
 ---
 
+## Installation & Usage
+
+Download the `database.js` file and paste it anywhere in your behavior pack `scripts/`. Import the database module from your entry point (`main.js`) file. This automatically decorates all `world` and `Entity` instances with seamless `.database` and `.db` database access.
+
+```javascript
+import "./path/to/database.js"; // Registers lazy getters for world and entities
+```
+
+---
+
 ## API Reference
 
 ### `database.get(name, [initial = {}])`
