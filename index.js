@@ -23,14 +23,14 @@ export const DATABASE_CACHE = {};
 
 export default class Database {
     /**
-     * 
-     * @param {world | Entity | Player} target 
+     * A simple cached dynamic property database class wrapper for World and Entity instances.
+     * @param {world | Entity | Player} target The target instance holding dynamic properties.
      */
     constructor(target) {
         this.target = target;
         this.id = target.id ?? "world";
 
-        DATABASE_CACHE[this.id] ??= {};
+        DATABASE_CACHE[this.id] ??= {}; // Initialize target partition memory cache
     }
 
     /**
@@ -39,8 +39,10 @@ export default class Database {
      * @returns {boolean} Whether or not the database key exists in cache or exists at all.
      */
     has(name) {
-        if (name in DATABASE_CACHE[this.id]) return true;
-        return this.get(name) !== undefined;
+        if (name in DATABASE_CACHE[this.id]) {
+            return DATABASE_CACHE[this.id][name] !== undefined;
+        }
+        return this.target.getDynamicProperty(name) !== undefined;
     }
 
     /**
@@ -82,6 +84,22 @@ export default class Database {
     delete(name) {
         this.target.setDynamicProperty(name, undefined);
         return delete DATABASE_CACHE[this.id][name];
+    }
+
+    /**
+     * Returns the available set of dynamic property identifiers that have been used on this.
+     * @returns {array<string>} A string array of the dynamic properties set on this instance.
+     */
+    keys() {
+        return this.target.getDynamicPropertyIds();
+    }
+
+    /**
+     * Returns the total size, in bytes, of all dynamic properties stored for this instance.
+     * @returns {number} Total byte size, including the size of both the key and the value.
+     */
+    size() {
+        return this.target.getDynamicPropertyTotalByteCount();
     }
 }
 
