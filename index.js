@@ -1,25 +1,11 @@
 import { world, system, Entity } from "@minecraft/server";
 
 /**
- * This cache will hold our database calls into memory to avoid unneeded reparsing
- * The parent key is Entity.id strings and "world" for world
- * The child keys are names of dynamic properties to their parsed values
+ * This cache will hold our data from our database calls in memory to avoid unneeded reparsing
+ * The parent key for the cache are Entity.id strings and "world" for @minecraft/server.world
+ * The child keys of those are names of dynamic property keys to their parsed cached values
  */
 export const DATABASE_CACHE = {};
-
-/**
- * 
- *  @example
- *  
- *  // Primitive numbers and booleans are saved natively with no JSON.stringify
- *  player.database.set("coins", 500); 
- *  const coins = player.database.get("coins"); // returns 500 (number)
- * 
- *  // Objects & Arrays are JSON serialized
- *  world.database.set("settings", { spawn: { x: 0, y: 0, z: 0 }, cheats: false });
- *  const { spawn, cheats } = world.database.get("settings");
- * 
- */
 
 export default class Database {
     /**
