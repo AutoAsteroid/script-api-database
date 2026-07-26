@@ -33,11 +33,22 @@ export default class Database {
         DATABASE_CACHE[this.id] ??= {};
     }
 
+    /**
+     * Fetches the existence of a dynamic property in the dynamic properties of this instance. 
+     * @param {string} name The dynamic property key name saved to check.
+     * @returns {boolean} Whether or not the database key exists in cache or exists at all.
+     */
     has(name) {
         if (name in DATABASE_CACHE[this.id]) return true;
         return this.get(name) !== undefined;
     }
 
+    /**
+     * Gets a saved dynamic property from cache and loads it into cache if it is not cached yet.
+     * @param {string} name The dynamic property key name saved to get.
+     * @param {any} [initial={}] Optional value to instantiate the database to if its undefined.
+     * @returns {any} The cached database value or parsed dynamic property value.
+     */
     get(name, initial = {}) {
         const cached = DATABASE_CACHE[this.id][name];
         if (cached !== undefined) return cached;
@@ -50,6 +61,12 @@ export default class Database {
         return DATABASE_CACHE[this.id][name] = data;
     }
 
+    /**
+     * Saves a dynamic property to world and save it into the cache for later direct access.
+     * @param {string} name The dynamic property key name saved to save.
+     * @param {object|array|string|number|boolean|undefined} data Data to save to world.
+     * @returns {any} Returns whatever value was passed into the data parameter directly
+     */
     set(name, data) {
         const isObject = typeof data === "object" && data !== null;
         const valueToSave = isObject ? JSON.stringify(data) : data;
@@ -58,7 +75,11 @@ export default class Database {
         return DATABASE_CACHE[this.targetId][name] = data;
     }
 
-    delete() {
+    /**
+     * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
+     * @returns {boolean} Whether or not the database dynamic property was deleted from CACHE.
+     */
+    delete(name) {
         this.target.setDynamicProperty(name, undefined);
         return delete DATABASE_CACHE[this.id][name];
     }
