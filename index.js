@@ -63,3 +63,52 @@ export default class Database {
         return delete DATABASE_CACHE[this.id][name];
     }
 }
+
+/**
+ * Attach a self-overwriting lazy getter to Entity and World prototypes for seemless usage:
+ */
+
+for (const Prototype of [ Entity.prototype, World.prototype ]) {
+    /**
+     * LAZY INITIALIZATION & INSTANCE OVERWRITE (Runs ONLY ONCE per object instance):
+     * 
+     * 1. First Access (Getter Triggered):
+     *      When `target.database` is called for the very first time, the prototype getter fires,
+     *      instantiates new Database(this), and binds it to the specific instance (`this`).
+     * 
+     * 2. Self-Overwriting Property:
+     *      Object.defineProperty(this, "database", ...) defines a flat `value` property 
+     *      directly on the individual instance (`this`), masking this prototype getter.
+     * 
+     * 3. Subsequent Accesses (Zero Overhead):
+     *      All future calls to `target.database` bypass this getter completely and read 
+     *      the stored `Database` instance directly from memory as a plain property lookup.
+     */
+    Object.defineProperty(Prototype, "database", {
+        get() {
+            const database = new Database(this);
+
+            // Overwrite "database" on THIS INSTANCE with the static class instance
+            Object.defineProperty(this, "database", {
+                value: database,
+                writable: false,
+                configurable: true
+            });
+
+            return database;
+        },
+        // Allows the prototype getter to be overwritten by the instance above
+        configurable: true
+    });
+}
+
+/**
+ * This allows native database usage across entities, players, and the world:
+ * 
+ * - world.database.get("key", value)
+ * - entity.database.set("key", value)
+ * - player.database.has("key")
+ * - player.database.delete("key")
+ * 
+ * Player extends Entity in native @minecraft/server, so players automatically inherit this.
+ */
