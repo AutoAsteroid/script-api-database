@@ -44,12 +44,23 @@ export default class Database {
         const cached = DATABASE_CACHE[this.id][name];
         if (cached !== undefined) return cached;
 
+        // Return the base key if it exists (raw is <= 32767 characters)
         const raw = this.target.getDynamicProperty(name);
-        if (raw === undefined)
-            return DATABASE_CACHE[this.id][name] = initial;
+        if (raw !== undefined)
+            return DATABASE_CACHE[this.id][name] = JSON.parse(raw);
+        
+        // Partitioned chunk assembly for values that exceed the character limit
+        let fullString = "";
+        for (let i = 0;; i++) {
+            const chunk = this.target.getDynamicProperty(name + ":" + i);
+            if (chunk === undefined) break;
+            else fullString += chunk;
+        }
+        if (fullString.length)
+            return DATABASE_CACHE[this.id][name] = JSON.parse(fullString);
 
-        const data = typeof raw === "string" ? JSON.parse(raw) : raw;
-        return DATABASE_CACHE[this.id][name] = data;
+        // Fallback to initial if the dynamic property does not exist anywhere
+        return DATABASE_CACHE[this.id][name] = initial;
     }
 
     /**
@@ -59,13 +70,12 @@ export default class Database {
      * @returns {any} Returns whatever value was passed into the data parameter directly
      */
     set(name, data) {
-        const isObject = typeof data === "object" && data !== null;
-        const serialized = isObject ? JSON.stringify(data) : data;
+        const serialized = JSON.stringify(data);
 
-        // Native type save for non strings OR strings under the character limit
-        if (typeof serialized !== "string" || serialized.length <= 32767) {
+        // Unchunked save for strings under Minecraft's 16 bit 32767 character limit
+        if (serialized.length <= 32767) {
             this.target.setDynamicProperty(name, serialized);
-        } 
+        }
         // Partition the database object into chunks if over the string size limit
         else for (let i = 0; i < serialized.length; i += 32767) {
             const key = `${name}:${i / 32767}`;
