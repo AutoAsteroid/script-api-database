@@ -1,10 +1,10 @@
-# Script API Database
+# 💾 Script API Database
 
 A high-performance, light-memory database wrapper for Minecraft Bedrock's Script API (`@minecraft/server`). Built with zero-copy payload chunking, self-overwriting lazy getters, and automated JSON serialization.  Packed with an additional external local JSON file database written in go using `@minecraft/server-net`.
 
 ---
 
-## Features
+## ⚙️ Features
 
 | Feature | How It Works | Technical Advantage |
 | :--- | :--- | :--- |
@@ -15,7 +15,7 @@ A high-performance, light-memory database wrapper for Minecraft Bedrock's Script
 
 ---
 
-## Installation & Usage
+## 📦 Installation & Usage
 
 Download the `database.js` file and paste it anywhere in your behavior pack `scripts/`. Import the database module from your entry point (`main.js`) file. This automatically decorates all `world` and `Entity` instances with seamless `.database` and `.db` database access.
 
@@ -25,7 +25,7 @@ import "./path/to/database.js"; // Registers lazy getters for world and entities
 
 ---
 
-## API Reference
+## 📖 API Reference
 
 ### `database.get(name, [initial = {}])`
 
