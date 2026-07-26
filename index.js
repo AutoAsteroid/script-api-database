@@ -25,10 +25,13 @@ export default class Database {
      * @returns {boolean} Whether or not the database key exists in cache or exists at all.
      */
     has(name) {
-        if (name in DATABASE_CACHE[this.id]) {
+        // O(1) check if the dynamic property name already exists in cache
+        if (name in DATABASE_CACHE[this.id])
             return DATABASE_CACHE[this.id][name] !== undefined;
-        }
-        return this.target.getDynamicProperty(name) !== undefined;
+
+        // Check the base property and partitioned chunk zero for existence
+        if (this.target.getDynamicProperty(name) !== undefined) return true;
+        return this.target.getDynamicProperty(name + ":0") !== undefined;
     }
 
     /**
@@ -57,9 +60,18 @@ export default class Database {
      */
     set(name, data) {
         const isObject = typeof data === "object" && data !== null;
-        const valueToSave = isObject ? JSON.stringify(data) : data;
+        const serialized = isObject ? JSON.stringify(data) : data;
 
-        this.target.setDynamicProperty(name, valueToSave);
+        // Native type save for non strings OR strings under the character limit
+        if (typeof serialized !== "string" || serialized.length <= 32767) {
+            this.target.setDynamicProperty(name, serialized);
+        } 
+        // Partition the database object into chunks if over the string size limit
+        else for (let i = 0; i < serialized.length; i += 32767) {
+            const key = `${name}:${i / 32767}`;
+            const chunk = serialized.slice(i, i + 32767);
+            this.target.setDynamicProperty(key, chunk);
+        }
         return DATABASE_CACHE[this.targetId][name] = data;
     }
 
@@ -68,7 +80,15 @@ export default class Database {
      * @returns {boolean} Whether or not the database dynamic property was deleted from CACHE.
      */
     delete(name) {
-        this.target.setDynamicProperty(name, undefined);
+        const updates = { [name]: undefined };
+        const prefix = `${name}:`;
+
+        // Deletes any partitioned string chunks if they exist
+        for (const key of this.target.getDynamicPropertyIds()) 
+            if (key.startsWith(prefix))
+                updates[key] = undefined;
+
+        this.target.setDynamicProperties(updates);
         return delete DATABASE_CACHE[this.id][name];
     }
 
