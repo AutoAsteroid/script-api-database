@@ -155,6 +155,12 @@ for (const Prototype of [ Entity.prototype, world ]) {
         // Allows the prototype getter to be overwritten by the instance above
         configurable: true
     });
+
+    // Database alias so accessing world/entity.db just reads database property directly
+    Object.defineProperty(Prototype, "db", {
+        get() { return this.database; },
+        configurable: true
+    });
 }
 
 /**
