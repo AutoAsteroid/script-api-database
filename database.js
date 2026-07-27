@@ -72,17 +72,20 @@ export default class Database {
         if (data === undefined || data === null) return this.delete(name); 
 
         const serialized = JSON.stringify(data);
+        const updates = {};
 
         // Unchunked save for strings under Minecraft's 16 bit 32767 character limit
         if (serialized.length <= 32767) {
-            this.target.setDynamicProperty(name, serialized);
+            updates[name] = serialized;
         }
         // Partition the database object into chunks if over the string size limit
         else for (let i = 0; i < serialized.length; i += 32767) {
             const key = `${name}:${i / 32767}`;
-            const chunk = serialized.slice(i, i + 32767);
-            this.target.setDynamicProperty(key, chunk);
+            updates[key] = serialized.slice(i, i + 32767);
         }
+        
+        // Single native call into Bedrock C++ engine
+        this.target.setDynamicProperties(updates);
         return this.cache[name] = data;
     }
 
