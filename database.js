@@ -16,7 +16,7 @@ export default class Database {
         this.target = target;
         this.id = target.id ?? "world";
 
-        DATABASE_CACHE[this.id] ??= {}; // Initialize target partition memory cache
+        this.cache = DATABASE_CACHE[this.id] ??= {}; // Initialize target memory cache
     }
 
     /**
@@ -26,8 +26,7 @@ export default class Database {
      */
     has(name) {
         // O(1) check if the dynamic property name already exists in cache
-        if (name in DATABASE_CACHE[this.id])
-            return DATABASE_CACHE[this.id][name] !== undefined;
+        if (name in this.cache) return this.cache[name] !== undefined;
 
         // Check the base property and partitioned chunk zero for existence
         if (this.target.getDynamicProperty(name) !== undefined) return true;
@@ -41,13 +40,12 @@ export default class Database {
      * @returns {any} The cached database value or parsed dynamic property value.
      */
     get(name, initial = {}) {
-        const cached = DATABASE_CACHE[this.id][name];
+        const cached = this.cache[name];
         if (cached !== undefined) return cached;
 
         // Return the base key if it exists (raw is <= 32767 characters)
         const raw = this.target.getDynamicProperty(name);
-        if (raw !== undefined)
-            return DATABASE_CACHE[this.id][name] = JSON.parse(raw);
+        if (raw !== undefined) return this.cache[name] = JSON.parse(raw);
         
         // Partitioned chunk assembly for values that exceed the character limit
         let fullString = "";
@@ -57,10 +55,10 @@ export default class Database {
             else fullString += chunk;
         }
         if (fullString.length)
-            return DATABASE_CACHE[this.id][name] = JSON.parse(fullString);
+            return this.cache[name] = JSON.parse(fullString);
 
         // Fallback to initial if the dynamic property does not exist anywhere
-        return DATABASE_CACHE[this.id][name] = initial;
+        return this.cache[name] = initial;
     }
 
     /**
@@ -82,7 +80,7 @@ export default class Database {
             const chunk = serialized.slice(i, i + 32767);
             this.target.setDynamicProperty(key, chunk);
         }
-        return DATABASE_CACHE[this.id][name] = data;
+        return this.cache[name] = data;
     }
 
     /**
@@ -99,7 +97,7 @@ export default class Database {
                 updates[key] = undefined;
 
         this.target.setDynamicProperties(updates);
-        return delete DATABASE_CACHE[this.id][name];
+        return delete this.cache[name];
     }
 
     /**
