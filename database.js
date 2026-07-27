@@ -68,7 +68,7 @@ export default class Database {
      * @returns {any} Returns whatever value was passed into the data parameter directly
      */
     set(name, data) {
-        // Early delete since instead if data was passed as undefined or null
+        // Early delete instead if data was passed as undefined or null (returns bool)
         if (data === undefined || data === null) return this.delete(name); 
 
         const serialized = JSON.stringify(data);

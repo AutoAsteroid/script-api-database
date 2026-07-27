@@ -116,7 +116,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
 
 ```javascript
 // Automatically partitioned across 'data:0', 'data:1', etc.
-const massivePayload = "Hello world!".repeat(100000); 
+const massivePayload = "a".repeat(100000); 
 world.database.set("data", massivePayload);
 world.setDynamicProperty("data", massivePayload); // ERROR!
 
