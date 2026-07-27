@@ -40,8 +40,8 @@ export default class Database {
      * @returns {any} The cached database value or parsed dynamic property value.
      */
     get(name, initial = {}) {
-        const cached = this.cache[name];
-        if (cached !== undefined) return cached;
+        // Get the parsed property directly from memory if it is already cached
+        if (this.cache[name] !== undefined) return this.cache[name];
 
         // Return the base key if it exists (raw is <= 32767 characters)
         const raw = this.target.getDynamicProperty(name);
@@ -68,6 +68,9 @@ export default class Database {
      * @returns {any} Returns whatever value was passed into the data parameter directly
      */
     set(name, data) {
+        // Early delete since instead if data was passed as undefined or null
+        if (data === undefined || data === null) return this.delete(name); 
+
         const serialized = JSON.stringify(data);
 
         // Unchunked save for strings under Minecraft's 16 bit 32767 character limit
@@ -89,7 +92,7 @@ export default class Database {
      */
     delete(name) {
         const updates = { [name]: undefined };
-        const prefix = `${name}:`;
+        const prefix = name + ":";
 
         // Deletes any partitioned string chunks if they exist
         for (const key of this.target.getDynamicPropertyIds()) 
