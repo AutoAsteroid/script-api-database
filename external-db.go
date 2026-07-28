@@ -158,3 +158,29 @@ func handleSaveJSON(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+/**
+ * Deletes the provided JSON file at the provided file path under `JsonDirectory`
+ * Returns status 200 if the deletion was successful
+ */
+func handleDeleteJSON(w http.ResponseWriter, r *http.Request) {
+	// Early validation to make sure HTTP method matches what its supposed to
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Method Invalid", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Resolve the target JSON data file path after validating the request
+	filePath, ok := validateAndResolvePath(w, r)
+	if !ok {
+		return
+	}
+
+	// Delete JSON file path from disk
+	if err := os.Remove(filePath); err != nil {
+		http.Error(w, "Failed to delete file", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
