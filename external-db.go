@@ -35,6 +35,7 @@ func main() {
 	// Handle basic CRUD REST API operations for script API to request 
 	http.HandleFunc("/loadJSON", handleLoadJSON)
 	http.HandleFunc("/saveJSON", handleSaveJSON)
+	http.HandleFunc("/deleteJSON", handleDeleteJSON)
 
 	log.Printf("External local JSON database running on %s", HostAddress)
 

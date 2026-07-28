@@ -10,7 +10,7 @@ const HTTP_ADDRESS = "http://127.0.0.1:8080";
 const AUTH_TOKEN = "asteroid-db-script-api"; // Protect from local programs
 
 /**
- * Reads from a JSON file stored in the external local json/ folder
+ * Reads from a JSON file stored in the external local JSON data folder
  * @param {string} file The file identifier path (excluding .json)
  * @returns {Promise<any|null>} The parsed object or null on failure
  */
@@ -35,7 +35,7 @@ async function loadJSON(file) {
 }
 
 /**
- * Writes to a JSON file stored in the external local json/ folder
+ * Writes to a JSON file stored in the external local JSON data folder
  * @param {string} file The file identifier path (excluding .json)
  * @param {any} data The data object to store in the json file
  * @returns {Promise<boolean>} Success status if the write worked
@@ -43,7 +43,7 @@ async function loadJSON(file) {
 async function saveJSON(file, data) {
     const request = new HttpRequest(HTTP_ADDRESS + "/saveJSON");
 
-    // Target file is passed in the header rather than body
+    // Target file is passed in the header rather than request body
     request.method = HttpRequestMethod.Post;
 
     // Go does not need to do any parsing on the actual JSON data
@@ -62,8 +62,31 @@ async function saveJSON(file, data) {
     }
 }
 
+/**
+ * Delets a JSON file stored in the external local JSON data folder
+ * @param {string} file The file identifier path (excluding .json)
+ * @returns {Promise<boolean>} Success status if the delete worked
+ */
+async function deleteJSON(file) {
+    const request = new HttpRequest(HTTP_ADDRESS + "/deleteJSON");
+
+    // Target file is passed in the header rather than in the URL
+    request.method = HttpRequestMethod.Delete;
+    request.headers = [
+        new HttpHeader("auth", AUTH_TOKEN),
+        new HttpHeader("file", file)
+    ];
+
+    try {
+        const response = await http.request(request);
+        return response.status === 200;
+    } catch {
+        return false;
+    }
+}
+
 // Attach external database access to system.database to use anywhere
-system.database = { load: loadJSON, save: saveJSON };
+system.database = { load: loadJSON, save: saveJSON, delete: deleteJSON };
 
 // Alias names points directly to the system.database function object
 system.db = system.database;
