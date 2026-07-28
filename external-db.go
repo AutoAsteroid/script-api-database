@@ -1,5 +1,15 @@
 package main
 
+/**
+ * This program sets up a HTTP endpoint that lets script api save and load data to our local
+ * JSON files stored in `JsonDirectory`. You must be using BDS to use @minecraft/server-net
+ * and a VPS or machine that lets you run your own programs. This program must be running
+ * alongside your bedrock_server executable.
+ *
+ * I RECOMMEND YOU USE EXTERNAL JSON FILES FOR COLD OR SHARED STORAGE ONLY. Frequent read and
+ * writes is bad for disk I/O. One example could be a persistent blacklist saved across worlds. 
+ */
+
 import (
 	"io"
 	"log"
