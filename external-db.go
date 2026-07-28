@@ -43,6 +43,11 @@ func main() {
 	}
 }
 
+/**
+ * Makes sure the response has valid headers and is authenticated to call this endpoint
+ * This assumes the bedrock_server is running on the same machine. If you must run this on
+ * on a different machine, you should remove the localhost check and change the auth token
+ */
 func validateAndResolvePath(w http.ResponseWriter, r *http.Request) (string, bool) {
 	// Make sure our requests are only received from localhost for safety
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
@@ -57,14 +62,14 @@ func validateAndResolvePath(w http.ResponseWriter, r *http.Request) (string, boo
 		return "", false
 	}
 
-	// 3. Get file path from header
+	// Make sure the file name header is passed (location to store JSON file)
 	fileName := r.Header.Get("file")
 	if fileName == "" {
 		http.Error(w, "Missing file header", http.StatusBadRequest)
 		return "", false
 	}
 
-	// Clean path to prevent Directory Traversal attacks (e.g., "../../etc/passwd")
+	// Protection to prevent directory traversal (e.g., "../../etc/passwd")
 	cleanRelPath := filepath.Clean(fileName)
 	if strings.HasPrefix(cleanRelPath, "..") || filepath.IsAbs(cleanRelPath) {
 		http.Error(w, "Invalid file path", http.StatusBadRequest)
@@ -76,30 +81,30 @@ func validateAndResolvePath(w http.ResponseWriter, r *http.Request) (string, boo
 		cleanRelPath += ".json"
 	}
 
-	// Combine base data directory with clean path
-	fullPath := filepath.Join(JsonDirectory, cleanRelPath)
-	return fullPath, true
+	return filepath.Join(JsonDirectory, cleanRelPath), true
 }
 
+/**
+ * Loads the provided file path under `JsonDirectory` directly into the response body
+ * We stream the bytes directly to the response, allocating nothing into RAM
+ */
 func handleLoadJSON(w http.ResponseWriter, r *http.Request) {
+	// Early validation to make sure HTTP method matches what its supposed to
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method Invalid", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Resolve the target JSON data file path after validating the request
 	filePath, ok := validateAndResolvePath(w, r)
 	if !ok {
 		return
 	}
 
-	// Open the target file directly
+	// Open the target file directly and make sure it exists
 	file, err := os.Open(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			http.Error(w, "File not found", http.StatusNotFound)
-		} else {
-			http.Error(w, "Error reading file", http.StatusInternalServerError)
-		}
+		http.Error(w, "Failed reading file", http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
@@ -107,29 +112,35 @@ func handleLoadJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	// Stream file bytes directly to the HTTP response writer (Zero allocation)
+	// Stream file bytes directly to HTTP response writer with zero allocation
 	_, _ = io.Copy(w, file)
 }
 
+/**
+ * Saves the request BODY directly to disk at the provided file path under `JsonDirectory`
+ * JSON encoding is not needed because the HTTP request body is already stringified
+ */
 func handleSaveJSON(w http.ResponseWriter, r *http.Request) {
+	// Early validation to make sure HTTP method matches what its supposed to
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Invalid", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Resolve the target JSON data file path after validating the request
 	filePath, ok := validateAndResolvePath(w, r)
 	if !ok {
 		return
 	}
 
 	// Automatically create nested directories if subfolders were provided in the path
-	parentDir := filepath.Dir(filePath)
-	if err := os.MkdirAll(parentDir, 0755); err != nil {
-		http.Error(w, "Failed to create folder structure", http.StatusInternalServerError)
+	parentDirectory := filepath.Dir(filePath)
+	if err := os.MkdirAll(parentDirectory, 0755); err != nil {
+		http.Error(w, "Failed to create folders", http.StatusInternalServerError)
 		return
 	}
 
-	// Create/Overwrite target file
+	// Create/overwrite target file path
 	file, err := os.Create(filePath)
 	if err != nil {
 		http.Error(w, "Failed to create file", http.StatusInternalServerError)
@@ -137,7 +148,7 @@ func handleSaveJSON(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Stream raw request body straight into the disk file (Zero JSON parsing)
+	// Stream raw request body straight into the disk file with zero JSON parsing
 	_, err = io.Copy(file, r.Body)
 	if err != nil {
 		http.Error(w, "Failed to write data to disk", http.StatusInternalServerError)
