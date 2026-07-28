@@ -64,10 +64,16 @@ console.warn(world.database.keys()); // String array of property IDs
 console.warn(world.database.size()); // Total byte count used on target
 
 /**
- * EXTERNAL LOCAL JSON FILE DATABASE USAGE
+ * EXTERNAL LOCAL JSON FILE DATABASE SAVE, LOAD, AND DELETE USAGE
  */
 const blacklist = await system.database.load("blacklist");
 blacklist[player.name] = { reason: "Cheating", date: Date.now() };
 
 // Save changes to disk to persist changes, should always return true
-const success = await system.database.save("blacklist", blacklist);
+const saved = await system.database.save("blacklist", blacklist);
+
+// Save to a JSON subfolder and deleting that subfolder
+const stats = { money: 0, kills: 0, deaths: 0 };
+const scores = await system.database.save(`stats/${player.name}`, stats);
+
+const deleted = await system.database.delete(`stats/${player.name}`);
