@@ -14,12 +14,13 @@ const AUTH_TOKEN = "script-api";
  * @returns {Promise<any|null>} The parsed object or null on failure
  */
 async function loadJSON(file) {
-    const request = new HttpRequest(`${HTTP_ADDRESS}/loadJSON`);
-    request.method = HttpRequestMethod.Post;
-    request.body = JSON.stringify({ file });
+    const request = new HttpRequest(HTTP_ADDRESS + "/loadJSON");
+
+    request.method = HttpRequestMethod.Get;
     request.headers = [
         new HttpHeader("Content-Type", "application/json"),
-        new HttpHeader("auth", AUTH_TOKEN)
+        new HttpHeader("auth", AUTH_TOKEN),
+        new HttpHeader("file", file)
     ];
 
     try {
@@ -37,12 +38,14 @@ async function loadJSON(file) {
  * @returns {Promise<boolean>} Success status
  */
 async function saveJSON(file, data) {
-    const request = new HttpRequest(`${HTTP_ADDRESS}/saveJSON`);
+    const request = new HttpRequest(HTTP_ADDRESS + "/saveJSON");
+
     request.method = HttpRequestMethod.Post;
-    request.body = JSON.stringify({ file, json: data });
+    request.body = JSON.stringify(data);
     request.headers = [
         new HttpHeader("Content-Type", "application/json"),
-        new HttpHeader("auth", AUTH_TOKEN)
+        new HttpHeader("auth", AUTH_TOKEN),
+        new HttpHeader("file", file)
     ];
 
     return await http.request(request)
