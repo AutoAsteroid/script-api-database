@@ -4,17 +4,6 @@ A high-performance, light-memory database wrapper for Minecraft Bedrock's Script
 
 ---
 
-## ⚙️ Features
-
-| Feature | How It Works | Technical Advantage |
-| :--- | :--- | :--- |
-| **Unlimited Payload Size** | Automatically partitions oversized data across sequential chunk keys (`key:0`, `key:1`, etc.). | Bypasses Bedrock's strict 32,767 character property limit without manual string management. |
-| **Memory Caching** | Stores parsed values in an in-memory session cache (`DATABASE_CACHE`) on first appearance. | $O(1)$ read performance after initial load, preventing repeated, expensive native JSON parsing. |
-| **JSON Serialization** | Passes all data types through `JSON.stringify()` and `JSON.parse()`. | Safely handles complex objects, arrays, numbers, floats, booleans, and `null` without type checks. |
-| **Seamless Entity & World Binding** | Uses self-overwriting prototype accessors (`entity.database` or `entity.db`) once on first call. | Integrates directly with `world.database` and `entity.database` without reimporting the database file. |
-
----
-
 ## 📦 Installation & Usage
 
 Download the `database.js` file and paste it anywhere in your behavior pack `scripts/`. Import the database module from your entry point (`main.js`) file. This automatically decorates all `world` and `Entity` instances with seamless `.database` and `.db` database access.
@@ -85,6 +74,17 @@ Writes to a JSON file stored in the external local JSON folder.
 * **Returns:** `boolean`
 
 ### 💡Example Usage: [examples.js](./examples.js)
+
+---
+
+## ⚙️ Features
+
+| Feature | How It Works | Technical Advantage |
+| :--- | :--- | :--- |
+| **Unlimited Payload Size** | Automatically partitions oversized data across sequential chunk keys (`key:0`, `key:1`, etc.). | Bypasses Bedrock's strict 32,767 character property limit without manual string management. |
+| **Memory Caching** | Stores parsed values in an in-memory session cache (`DATABASE_CACHE`) on first appearance. | $O(1)$ read performance after initial load, preventing repeated, expensive native JSON parsing. |
+| **JSON Serialization** | Passes all data types through `JSON.stringify()` and `JSON.parse()`. | Safely handles complex objects, arrays, numbers, floats, booleans, and `null` without type checks. |
+| **Seamless Entity & World Binding** | Uses self-overwriting prototype accessors (`entity.database` or `entity.db`) once on first call. | Integrates directly with `world.database` and `entity.database` without reimporting the database file. |
 
 ---
 
