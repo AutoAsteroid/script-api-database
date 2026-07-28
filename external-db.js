@@ -62,5 +62,6 @@ async function saveJSON(file, data) {
 // Attach external database access to system.database to use anywhere
 system.database = { load: loadJSON, save: saveJSON };
 
-// system.db alias points directly to system.database function object
+// Alias names points directly to the system.database function object
 system.db = system.database;
+system.external = system.database;
