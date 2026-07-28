@@ -10,7 +10,7 @@ const HTTP_ADDRESS = "http://127.0.0.1:8080";
 const AUTH_TOKEN = "asteroid-db-script-api"; // Protect from local programs
 
 /**
- * Reads from a JSON file stored on the external local json/ folder
+ * Reads from a JSON file stored in the external local json/ folder
  * @param {string} file The file identifier path (excluding .json)
  * @returns {Promise<any|null>} The parsed object or null on failure
  */
@@ -35,7 +35,7 @@ async function loadJSON(file) {
 }
 
 /**
- * Writes to a JSON file stored on the external local json/ folder
+ * Writes to a JSON file stored in the external local json/ folder
  * @param {string} file The file identifier path (excluding .json)
  * @param {any} data The data object to store in the json file
  * @returns {Promise<boolean>} Success status if the write worked

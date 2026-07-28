@@ -69,6 +69,21 @@ Returns the total byte size used by all dynamic properties on the target.
 
 * **Returns:** `number`
 
+### `await system.database.load(file)`
+
+Reads from a JSON file stored in the external local JSON folder.
+
+* **`file`** `(string)`: The file identifier path.
+* **Returns:** `any`
+
+### `await system.database.save(file, data)`
+
+Writes to a JSON file stored in the external local JSON folder.
+
+* **`file`** `(string)`: The file identifier path.
+* **`data`** `(any)`: Data to store.
+* **Returns:** `boolean`
+
 ### 💡Example Usage: [examples.js](./examples.js)
 
 ---
