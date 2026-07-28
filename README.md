@@ -6,10 +6,26 @@ A high-performance, light-memory database wrapper for Minecraft Bedrock's Script
 
 ## 📦 Installation & Usage
 
+### 1. Script Dynamic Properties
+
 Download the `database.js` file and paste it anywhere in your behavior pack `scripts/`. Import the database module from your entry point (`main.js`) file. This automatically decorates all `world` and `Entity` instances with seamless `.database` and `.db` database access.
 
 ```javascript
-import "./path/to/database.js"; // Registers lazy getters for world and entities
+import "./path/to/database.js";
+```
+
+### 2. External Local JSON Files
+
+If you would like access to cold or persistent storage saved outside the Script API environment, you must build and run the high performance Go bridge.
+
+```bash
+go build -o external-db main.go
+```
+
+After running the binary, paste the `external-db.js` file in your behavior pack `scripts/` and import it in your main entry file. You will then be able to access the external database with `system.database` calls.
+
+```javascript
+import "./path/to/external-db.js";
 ```
 
 ---
