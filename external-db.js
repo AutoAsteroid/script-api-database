@@ -54,9 +54,12 @@ async function saveJSON(file, data) {
         new HttpHeader("file", file)
     ];
 
-    return await http.request(request)
-        .then(() => true)
-        .catch(() => false);
+    try {
+        const response = await http.request(request);
+        return response.status === 200;
+    } catch {
+        return false;
+    }
 }
 
 // Attach external database access to system.database to use anywhere
