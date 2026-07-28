@@ -20,9 +20,10 @@ import (
 	"strings"
 )
 
+// Make sure these match the token and URL endpoint in the external-db.js implementation
 const (
 	HostAddress = "127.0.0.1:8080"
-	AuthToken = "script-api"
+	AuthToken = "asteroid-db-script-api"
 	JsonDirectory = "./json"
 )
 
@@ -31,6 +32,7 @@ func main() {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
 
+	// Handle basic CRUD REST API operations for script API to request 
 	http.HandleFunc("/loadJSON", handleLoadJSON)
 	http.HandleFunc("/saveJSON", handleSaveJSON)
 
@@ -41,17 +43,15 @@ func main() {
 	}
 }
 
-// Security, IP & Header Validation Middleware Helper
 func validateAndResolvePath(w http.ResponseWriter, r *http.Request) (string, bool) {
-	// 1. Strict Localhost Check
+	// Make sure our requests are only received from localhost for safety
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil || (host != "127.0.0.1" && host != "::1" && host != "localhost") {
-		// Return 403 Forbidden and reject non-localhost callers immediately
-		http.Error(w, "Forbidden: Localhost connections only", http.StatusForbidden)
+		http.Error(w, "Forbidden", http.StatusForbidden)
 		return "", false
 	}
 
-	// 2. Auth check
+	// Even though its localhost only, this protects us from other programs running
 	if r.Header.Get("auth") != AuthToken {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return "", false
