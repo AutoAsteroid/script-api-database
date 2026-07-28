@@ -69,6 +69,8 @@ Returns the total byte size used by all dynamic properties on the target.
 
 * **Returns:** `number`
 
+### 💡Example Usage: [examples.js](./examples.js)
+
 ---
 
 ## License
