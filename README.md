@@ -4,6 +4,14 @@ A high-performance, light-memory database wrapper for Minecraft Bedrock's Script
 
 ---
 
+## ⚙️ Features
+
+* **Unlimited Payload Size** — Automatically partitions oversized data across sequential chunk keys (`key:0`, `key:1`), bypasses Bedrock's strict 32,767 character property limit.
+* **Memory Caching** — Stores parsed values in an in-memory session cache (`DATABASE_CACHE`) on first appearance for $O(1)$ read performance and zero JSON parsing overhead.
+* **JSON Serialization** — Native stringify/parse handling that safely supports complex objects, arrays, numbers, booleans, and values like `null`.
+* **Seamless Prototype Binding** — Uses self-overwriting prototype accessors (`world.database`, `entity.database`, or `.db`) to attach directly to game objects once on first call.
+* **External JSON Files** — Allows access to store data outside the Bedrock Scripting API environment in JSON files for cold or persistent storage.
+
 ## 📦 Installation & Usage
 
 ### 1. Script Dynamic Properties
@@ -90,17 +98,6 @@ Writes to a JSON file stored in the external local JSON folder.
 * **Returns:** `boolean`
 
 ### 💡Example Usage: [examples.js](./examples.js)
-
----
-
-## ⚙️ Features
-
-| Feature | How It Works | Technical Advantage |
-| :--- | :--- | :--- |
-| **Unlimited Payload Size** | Automatically partitions oversized data across sequential chunk keys (`key:0`, `key:1`, etc.). | Bypasses Bedrock's strict 32,767 character property limit without manual string management. |
-| **Memory Caching** | Stores parsed values in an in-memory session cache (`DATABASE_CACHE`) on first appearance. | $O(1)$ read performance after initial load, preventing repeated, expensive native JSON parsing. |
-| **JSON Serialization** | Passes all data types through `JSON.stringify()` and `JSON.parse()`. | Safely handles complex objects, arrays, numbers, floats, booleans, and `null` without type checks. |
-| **Seamless Entity & World Binding** | Uses self-overwriting prototype accessors (`entity.database` or `entity.db`) once on first call. | Integrates directly with `world.database` and `entity.database` without reimporting the database file. |
 
 ---
 
