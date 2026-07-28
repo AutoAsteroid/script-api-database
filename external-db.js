@@ -7,7 +7,7 @@ import { http, HttpRequest, HttpRequestMethod, HttpHeader } from "@minecraft/ser
  */
 
 const HTTP_ADDRESS = "http://127.0.0.1:8080";
-const AUTH_TOKEN = "asterioid-db-script-api"; // Protect from local programs
+const AUTH_TOKEN = "asteroid-db-script-api"; // Protect from local programs
 
 /**
  * Reads from a JSON file stored on the external local json/ folder
