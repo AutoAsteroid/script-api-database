@@ -62,3 +62,12 @@ world.database.delete("data"); // false
 
 console.warn(world.database.keys()); // String array of property IDs
 console.warn(world.database.size()); // Total byte count used on target
+
+/**
+ * EXTERNAL LOCAL JSON FILE DATABASE USAGE
+ */
+const blacklist = await system.database.load("blacklist");
+blacklist[player.name] = { reason: "Cheating", date: Date.now() };
+
+// Save changes to disk to persist changes, should always return true
+const success = await system.database.save("blacklist", blacklist);

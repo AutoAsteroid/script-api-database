@@ -24,7 +24,7 @@ import "./path/to/database.js";
 
 ### 2. External Local JSON Files
 
-If you would like access to cold or persistent storage saved outside the Script API environment, you must build and run the high performance Go bridge.
+If you would like access to cold or persistent storage saved outside the Script API environment, you must build and run the high performance Go bridge. You should use `systemd` or equivalent methods to keep this program running.
 
 ```bash
 go build -o external-db main.go
