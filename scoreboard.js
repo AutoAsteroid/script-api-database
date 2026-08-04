@@ -72,3 +72,6 @@ export function resetObjective(objective) {
     if (existing) world.scoreboard.removeObjective(objective);
     return world.scoreboard.addObjective(objective, display);
 }
+
+// Attach objective helper function access to world.objective to use anywhere
+world.objective = { get: getObjective, reset: resetObjective };
