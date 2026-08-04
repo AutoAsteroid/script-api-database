@@ -125,7 +125,7 @@ export default class Database {
 }
 
 /**
- * Attach a self-overwriting lazy getter to Entity and World prototypes for seemless usage:
+ * Attach a self-overwriting lazy getter to Entity and World prototypes for seamless usage:
  */
 
 for (const Prototype of [ Entity.prototype, world ]) {
