@@ -65,7 +65,7 @@ export default class Database {
      * Saves a dynamic property to world and save it into the cache for later direct access.
      * @param {string} name The dynamic property key name saved to save.
      * @param {object|array|string|number|boolean|undefined} data Data to save to world.
-     * @returns {any} Returns whatever value was passed into the data parameter directly
+     * @returns {any} Returns whatever value was passed into the data parameter directly.
      */
     set(name, data) {
         // Early delete instead if data was passed as undefined or null (returns bool)
@@ -91,6 +91,7 @@ export default class Database {
 
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
+     * @param {string} name The dynamic property key name saved to delete.
      * @returns {boolean} Whether or not the database dynamic property was deleted from CACHE.
      */
     delete(name) {

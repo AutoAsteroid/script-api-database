@@ -1,5 +1,7 @@
 import { world } from "@minecraft/server";
 
+// For primitive things like stats, native scoreboards are MUCH better than dynamic property objects
+
 export class EntityScoreboard {
     constructor() {
 
@@ -24,4 +26,8 @@ export class EntityScoreboard {
     reset() {
 
     }
+}
+
+export class WorldScoreboard {
+    
 }
