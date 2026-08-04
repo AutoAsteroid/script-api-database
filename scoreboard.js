@@ -28,6 +28,18 @@ export class EntityScoreboard {
     }
 }
 
+/**
+ * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
+ * Direct world.scoreboard.getObjective() calls are about 100ms slower for every 10000~ calls. 
+ */
+export const OBJECTIVE_CACHE = {};
+
+/**
+ * In memory cache for all get() calls instead of always calling ScoreboardObjective.getScore()
+ * There is no eviction policy in place besides when a player leaves the server.
+ */
+export const SCORES_CACHE = {};
+
 export class WorldScoreboard {
     
 }
