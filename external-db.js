@@ -10,9 +10,9 @@ const HTTP_ADDRESS = "http://127.0.0.1:8080";
 const AUTH_TOKEN = "asteroid-db-script-api"; // Protect from local programs
 
 /**
- * Reads from a JSON file stored in the external local JSON data folder
- * @param {string} file The file identifier path (excluding .json)
- * @returns {Promise<any|null>} The parsed object or null on failure
+ * Reads from a JSON file stored in the external local JSON data folder.
+ * @param {string} file The file identifier path (excluding .json).
+ * @returns {Promise<any|null>} The parsed object or null on failure.
  */
 async function loadJSON(file) {
     const request = new HttpRequest(HTTP_ADDRESS + "/loadJSON");
@@ -35,10 +35,10 @@ async function loadJSON(file) {
 }
 
 /**
- * Writes to a JSON file stored in the external local JSON data folder
- * @param {string} file The file identifier path (excluding .json)
- * @param {any} data The data object to store in the json file
- * @returns {Promise<boolean>} Success status if the write worked
+ * Writes to a JSON file stored in the external local JSON data folder.
+ * @param {string} file The file identifier path (excluding .json).
+ * @param {any} data The data object to store in the json file.
+ * @returns {Promise<boolean>} Success status if the write worked.
  */
 async function saveJSON(file, data) {
     const request = new HttpRequest(HTTP_ADDRESS + "/saveJSON");
@@ -63,9 +63,9 @@ async function saveJSON(file, data) {
 }
 
 /**
- * Delets a JSON file stored in the external local JSON data folder
- * @param {string} file The file identifier path (excluding .json)
- * @returns {Promise<boolean>} Success status if the delete worked
+ * Delets a JSON file stored in the external local JSON data folder.
+ * @param {string} file The file identifier path (excluding .json).
+ * @returns {Promise<boolean>} Success status if the delete worked.
  */
 async function deleteJSON(file) {
     const request = new HttpRequest(HTTP_ADDRESS + "/deleteJSON");
