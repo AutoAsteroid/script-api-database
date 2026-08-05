@@ -45,20 +45,52 @@ export class EntityScoreboard {
         });
     }
 
-    set() {
-
+    /**
+     * Set the score of this participant for the defined scoreboard objective.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param {number | undefined | null} score New score to be set to the participant score.
+     * @returns {void}
+     */
+    set(objective, score) {
+        const scoreboard = getObjective(objective);
+        // Remove the scoreboard participant if the new value is nothing
+        if (score !== 0 && !score)
+            scoreboard.removeParticipant(participant);
+        else scoreboard.setScore(participant, score);
     }
 
-    add() {
-
+    /**
+     * Adds to the score of this participant for the defined scoreboard objective.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param {number} amount Amount to add to the score, either positive or negative.
+     * @returns The new scoreboard value after adding amount to it.
+     */
+    add(objective, amount) {
+        // Return 0 and do nothing if the passed amount is not a number
+        if (isNaN(amount)) return 0;
+    
+        // Round the scoreboard value before adding to the objective
+        const scoreboard = getObjective(objective);
+        return scoreboard.addScore(this.participant, Math.round(amount));
     }
 
-    remove() {
-
+    /**
+     * Removes from the score of this participant for the defined scoreboard objective.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param {number} amount Amount to remove from the score, either positive or negative.
+     * @returns The new scoreboard value after removing amount from it.
+     */
+    remove(objective, amount) {
+        return this.add(objective, -amount);
     }
 
-    reset() {
-
+    /**
+     * Resets an entry entirely for this participant in the defined scoreboard objective.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns {boolean} Whether or not there was a scoreboard entry to delete.
+     */
+    reset(objective) {
+        return getObjective(objective).removeParticipant(this.participant);
     }
 }
 
