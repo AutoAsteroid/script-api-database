@@ -46,7 +46,7 @@ export class EntityScoreboard {
     }
 
     /**
-     * Set the score of this participant for the defined scoreboard objective.
+     * Set the score of this participant for the provided scoreboard objective.
      * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @param {number | undefined | null} score New score to be set to the participant score.
      * @returns {void}
@@ -60,7 +60,7 @@ export class EntityScoreboard {
     }
 
     /**
-     * Adds to the score of this participant for the defined scoreboard objective.
+     * Adds to the score of this participant for the provided scoreboard objective.
      * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @param {number} amount Amount to add to the score, either positive or negative.
      * @returns The new scoreboard value after adding amount to it.
@@ -75,7 +75,7 @@ export class EntityScoreboard {
     }
 
     /**
-     * Removes from the score of this participant for the defined scoreboard objective.
+     * Removes from the score of this participant for the provided scoreboard objective.
      * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @param {number} amount Amount to remove from the score, either positive or negative.
      * @returns The new scoreboard value after removing amount from it.
@@ -85,12 +85,34 @@ export class EntityScoreboard {
     }
 
     /**
-     * Resets an entry entirely for this participant in the defined scoreboard objective.
+     * Checks if this participant has an entry in the provided scoreboard objective.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns {boolean} Whether or not this participant has an entry in this objective.
+     */
+    has(objective) {
+        return getObjective(objective).hasParticipant(this.participant);
+    }
+
+    /**
+     * Resets an entry entirely for this participant in the provided scoreboard objective.
      * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @returns {boolean} Whether or not there was a scoreboard entry to delete.
      */
     reset(objective) {
         return getObjective(objective).removeParticipant(this.participant);
+    }
+
+    /**
+     * Clears this scoreboard identity entirely across from all scoreboard objectives.
+     * @returns {number} The number of scoreboard entries this participant had to remove.
+     */
+    clear() {
+        let reseted = 0;
+        // JavaScript += will convert removeParticipant's boolean to a 1 or 0 on removal
+        for (const objective of world.scoreboard.getObjectives()) {
+            reseted += objective.removeParticipant(this.participant);
+        }
+        return reseted;
     }
 }
 
