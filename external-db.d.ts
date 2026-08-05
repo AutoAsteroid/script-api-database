@@ -36,7 +36,5 @@ declare module "@minecraft/server" {
         database: ExternalDatabase;
         /** External HTTP local JSON database file bridge. */
         db: ExternalDatabase;
-        /** External HTTP local JSON database file bridge. */
-        external: ExternalDatabase;
     }
 }
