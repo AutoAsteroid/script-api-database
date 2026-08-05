@@ -1,21 +1,13 @@
 import { world, Entity, ScoreboardIdentity } from "@minecraft/server";
 
-/**
- * In memory cache for all get() calls instead of always calling ScoreboardObjective.getScore()
- * There is no cache eviction policy in place besides when a player leaves the server.
- */
-export const SCORES_CACHE = {};
-
 export class EntityScoreboard {
     /**
-     * A simple cached scoreboard objective score class wrapper for Entity and Player instances.
+     * A simple scoreboard objective class wrapper for Entity and Player scoreboard instances.
      * @param {Entity | ScoreboardIdentity} participant Scoreboard participant entry to manage.
      */
     constructor(participant) {
         this.participant = participant;
         this.id = participant.id;
-
-        this.cache = SCORES_CACHE[this.id] ??= {}; // Initialize scoreboard memory cache
     }
 
     /**
@@ -24,16 +16,12 @@ export class EntityScoreboard {
      * @returns {number} Scoreboard score value for the participant of the fetched objective.
      */
     get(objective) {
-        // Return the cached scoreboard objective value if accessed in the past
-        if (objective in this.cache) return this.cache[objective];
-
         try {
             // scoreboard.getScore() can sometimes, rarely throw errors 
             const scoreboard = getObjective(objective);
-            const score = scoreboard.getScore(this.participant) ?? 0;
-            return this.cache[objective] = score;
+            return scoreboard.getScore(this.participant) ?? 0;
         } catch {
-            return this.cache[objective] = 0;
+            return 0;
         }
     }
 
@@ -57,14 +45,9 @@ export class EntityScoreboard {
         const scoreboard = getObjective(objective);
 
         // Remove the scoreboard participant if the new value is nothing
-        if (score !== 0 && !score) {
+        if (score !== 0 && !score)
             scoreboard.removeParticipant(this.participant);
-            delete this.cache[objective];
-        } else {
-            const rounded = Math.round(score);
-            scoreboard.setScore(this.participant, rounded);
-            this.cache[objective] = rounded;
-        }
+        else scoreboard.setScore(this.participant, Math.round(score));
     }
 
     /**
@@ -78,9 +61,7 @@ export class EntityScoreboard {
         if (isNaN(amount)) return 0;
     
         // Round the scoreboard value before adding to the objective
-        const scoreboard = getObjective(objective);
-        const newScore = scoreboard.addScore(this.participant, Math.round(amount));
-        return this.cache[objective] = newScore;
+        return getObjective(objective).addScore(this.participant, Math.round(amount));
     }
 
     /**
@@ -108,7 +89,6 @@ export class EntityScoreboard {
      * @returns {boolean} Whether or not there was a scoreboard entry to delete.
      */
     reset(objective) {
-        delete this.cache[objective];
         return getObjective(objective).removeParticipant(this.participant);
     }
 
@@ -121,7 +101,6 @@ export class EntityScoreboard {
         // JavaScript += will convert removeParticipant's boolean to a 1 or 0 on removal
         for (const objective of world.scoreboard.getObjectives()) {
             reseted += objective.removeParticipant(this.participant);
-            delete this.cache[objective.id];
         }
         return reseted;
     }
@@ -147,12 +126,6 @@ Object.defineProperty(Entity, "scores", {
     // Allows the prototype getter to be overwritten by the instance above
     configurable: true
 });
-
-/**
- * Scoreboard score cache eviction policy ONLY when they leave the server. All values will need
- * to be recached once they are first accessed again when the player joins the server.
- */
-world.beforeEvents.playerLeave.subscribe(({ player }) => delete SCORES_CACHE[player.id]);
 
 /**
  * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
