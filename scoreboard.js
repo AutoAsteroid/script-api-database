@@ -24,25 +24,27 @@ export class EntityScoreboard {
      * @returns {number} Scoreboard score value for the participant of the fetched objective.
      */
     get(objective) {
+        // Return the cached scoreboard objective value if accessed in the past
+        if (objective in this.cache) return this.cache[objective];
+
         try {
             // scoreboard.getScore() can sometimes, rarely throw errors 
             const scoreboard = getObjective(objective);
-            return scoreboard.getScore(this.participant) ?? 0;
+            const score = scoreboard.getScore(this.participant) ?? 0;
+            return this.cache[objective] = score;
         } catch {
-            return 0;
+            return this.cache[objective] = 0;
         }
     }
 
     /**
      * Creates a dynamic scoreboard proxy object for this participant for heavy scoreboard.get().
      * @returns {Object} Returns a proxy with dynamically fetched get scores. 
-     * @example const { money, kills, deaths } = player.scores.fetch();
+     * @example const { money, kills, deaths, scoreboardObjectiveId } = player.scores.fetch();
      */
     fetch() {
-        // Implicitly return an object of all scoreboard values if accessed.
-        return new Proxy({}, {
-            get: (_, objective) => getScore(this.participant, objective)
-        });
+        // Implicitly return an object of all scoreboard values if accessed directly
+        return new Proxy({}, { get: (_, objective) => getScore(objective) });
     }
 
     /**
@@ -53,17 +55,23 @@ export class EntityScoreboard {
      */
     set(objective, score) {
         const scoreboard = getObjective(objective);
+
         // Remove the scoreboard participant if the new value is nothing
-        if (score !== 0 && !score)
-            scoreboard.removeParticipant(participant);
-        else scoreboard.setScore(participant, score);
+        if (score !== 0 && !score) {
+            scoreboard.removeParticipant(this.participant);
+            delete this.cache[objective];
+        } else {
+            const rounded = Math.round(score);
+            scoreboard.setScore(this.participant, rounded);
+            this.cache[objective] = rounded;
+        }
     }
 
     /**
      * Adds to the score of this participant for the provided scoreboard objective.
      * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @param {number} amount Amount to add to the score, either positive or negative.
-     * @returns The new scoreboard value after adding amount to it.
+     * @returns {number} The new scoreboard value after adding amount to it.
      */
     add(objective, amount) {
         // Return 0 and do nothing if the passed amount is not a number
@@ -71,14 +79,15 @@ export class EntityScoreboard {
     
         // Round the scoreboard value before adding to the objective
         const scoreboard = getObjective(objective);
-        return scoreboard.addScore(this.participant, Math.round(amount));
+        const newScore = scoreboard.addScore(this.participant, Math.round(amount));
+        return this.cache[objective] = newScore;
     }
 
     /**
      * Removes from the score of this participant for the provided scoreboard objective.
      * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @param {number} amount Amount to remove from the score, either positive or negative.
-     * @returns The new scoreboard value after removing amount from it.
+     * @returns {number} The new scoreboard value after removing amount from it.
      */
     remove(objective, amount) {
         return this.add(objective, -amount);
@@ -99,6 +108,7 @@ export class EntityScoreboard {
      * @returns {boolean} Whether or not there was a scoreboard entry to delete.
      */
     reset(objective) {
+        delete this.cache[objective];
         return getObjective(objective).removeParticipant(this.participant);
     }
 
@@ -111,6 +121,7 @@ export class EntityScoreboard {
         // JavaScript += will convert removeParticipant's boolean to a 1 or 0 on removal
         for (const objective of world.scoreboard.getObjectives()) {
             reseted += objective.removeParticipant(this.participant);
+            delete this.cache[objective.id];
         }
         return reseted;
     }
