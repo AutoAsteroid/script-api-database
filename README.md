@@ -6,12 +6,14 @@ A high-performance, light-memory dynamic property database and scoreboard wrappe
 
 ## ⚙️ Features
 
-* **Unlimited Payload Size** — Automatically partitions oversized data across sequential chunk keys (`key:0`, `key:1`), bypassing Bedrock's strict 32,767 character property limit.
-* **Memory Caching** — Stores parsed database values and scoreboard objectives in cached memory for $O(1)$ read performance.
-* **JSON Serialization** — Native stringify/parse handling that safely supports complex objects, arrays, numbers, booleans, and values like `null`.
-* **Offline Player Scoreboards** — Implements a relational identity bridge (`#USERNAMES_MAP` & `#SCOREBOARD_ID`) to get and modify player scoreboards by username, even if they are offline.
-* **Seamless Prototype Binding** — Uses self-overwriting prototype accessors (`world.database`, `entity.database`, `entity.scores`) to attach directly to game objects on first access.
-* **External JSON Files** — Allows storing data outside the Bedrock Scripting API environment in local JSON files for cold or persistent storage via Go.
+| Feature | Description |
+| --- | --- |
+| **Unlimited Payload Size** | Automatically partitions oversized data across sequential chunk keys (`key:0`, `key:1`), bypassing Bedrock's strict 32,767 character string dynamic property limit. |
+| **Memory Caching** | Stores parsed database values and scoreboard objectives in cached memory (`DATABASE_CACHE` & `OBJECTIVE_CACHE`) for $O(1)$ access speed. |
+| **JSON Serialization** | Native stringify/parse handling that safely supports complex objects, arrays, numbers, floats, booleans, and values like `null`. |
+| **Offline Player Scoreboards** | Implements a relational identity bridge (`#USERNAMES_MAP` & `#SCOREBOARD_ID`) to get and modify player scoreboards by username, even if they are offline. |
+| **Seamless Prototype Binding** | Uses self-overwriting prototype accessors (`world.database`, `entity.database`, `entity.scores`) to attach directly to class instances on first access. |
+| **External JSON Files** | Allows storing data outside the Bedrock Scripting API environment in local JSON files for cold or persistent storage via Go. |
 
 ## 📦 Installation & Usage
 
