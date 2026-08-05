@@ -207,7 +207,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
  */
 
 /**
- * Returns an object record matching all player ScoreboardIdentity.id to their player names.
+ * Returns an object record matching all player ScoreboardIdentity IDs to their player names.
  * @returns {Object<number, string>} For example: { scoreboardIdentity.id: "AutoAsteroid" }
  */
 export function getScoreboardIdPlayerNameMap() {

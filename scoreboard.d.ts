@@ -82,3 +82,43 @@ export class EntityScoreboard {
      */
     clear(): number;
 }
+
+/**
+ * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
+ * Direct world.scoreboard.getObjective() calls are about 100ms slower for every 10000~ calls. 
+ */
+export const OBJECTIVE_CACHE: Record<string, ScoreboardObjective>;
+
+/**
+ * Returns a scoreboard objective from cache, creating it if it doesn't exist.
+ * @param objective String identifier of the scoreboard objective.
+ * @param displayName Optional display name of the objective.
+ * @returns The fetched cached objective class instance.
+ */
+export function getObjective(objective: string, displayName?: string | null): ScoreboardObjective;
+
+/**
+ * Resets a scoreboard objective by deleting it and recreating an instance of it.
+ * @param objective String identifier of the scoreboard objective.
+ * @returns The new objective class instance created.
+ */
+export function resetObjective(objective: string): ScoreboardObjective;
+
+/**
+ * Returns an object record matching all player ScoreboardIdentity IDs to their player names.
+ * @returns Map of { [scoreboardIdentity.id]: "PlayerName" }
+ */
+export function getScoreboardIdPlayerNameMap(): Record<number, string>;
+
+/**
+ * Returns an object record matching all player names to their corresponding ScoreboardIdentity.
+ * @returns Map of { ["PlayerName"]: ScoreboardIdentity }
+ */
+export function getPlayerNameParticipantMap(): Record<string, ScoreboardIdentity>;
+
+/**
+ * Gets a scoreboard wrapper instance for the specified username, whether or not they are offline.
+ * @param username The username of the player scoreboard to get from.
+ * @returns Scoreboard wrapper instance, null if the username is invalid.
+ */
+export function getPlayerScoreboardIdentity(username: string): EntityScoreboard | null;
