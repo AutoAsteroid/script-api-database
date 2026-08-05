@@ -171,9 +171,6 @@ export function resetObjective(objective) {
     return world.scoreboard.addObjective(objective, display);
 }
 
-// Attach objective helper function access to world.objectives to use anywhere
-world.objectives = { get: getObjective, reset: resetObjective };
-
 /**
  * This clever cross mapping implementation makes it possible to access offline player scoreboards
  * based off their username. ScoreboardIdentity always lives in the server, however accessing
@@ -257,3 +254,19 @@ export function getPlayerScoreboardIdentity(username) {
     if (participant === undefined) return null;
     else return new EntityScoreboard(participant);
 }
+
+/**
+ * Attach objective helper function access to world.objectives to use anywhere.
+ * Not to be confused with world.scoreboard objective functions.
+ */
+world.objectives = {
+    get: getObjective, 
+    reset: resetObjective,
+    
+    // Essentially enables getting EntityScoreboard of an offline player
+    identity: getPlayerScoreboardIdentity,
+
+    // Mapping functions to access even all offline player identities
+    participantMap: getPlayerNameParticipantMap,
+    playerNamesMap: getScoreboardIdPlayerNameMap
+};
