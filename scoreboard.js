@@ -168,3 +168,36 @@ export function resetObjective(objective) {
 
 // Attach objective helper function access to world.objectives to use anywhere
 world.objectives = { get: getObjective, reset: resetObjective };
+
+/**
+ * This clever cross mapping implementation makes it possible to access offline player scoreboards
+ * based off their username. ScoreboardIdentity always lives in the server, however accessing
+ * the correct corresponding participant identity of an offline player is a bit tricky.
+ */
+
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+    if (!initialSpawn) return;
+    // Maps dummy names to the player.scoreboardIdentity.id
+    const usernamesMap = getObjective("#USERNAMES_MAP");
+
+    // Maps actual player scoreboardIdentities to their id
+    const scoreboardID = getObjective("#SCOREBOARD_ID");
+
+    // scoreboardIdentity will be undefined if the player does not have any scoreboard entries
+    scoreboardID.addScore(player, 0);   // Ensure the player has at least one entry
+    scoreboardID.setScore(player, player.scoreboardIdentity.id);
+
+    // Make sure there is only one dummy scoreboard with the same scoreboardIdentity.id score
+    usernamesMap.getScores()
+        .filter(({ score }) => score === player.scoreboardIdentity.id)
+        .forEach(({ participant }) => usernamesMap.removeParticipant(participant));
+        
+    usernamesMap.setScore(player.name, player.scoreboardIdentity.id);
+});
+
+/**
+ * Every ScoreboardIdentity has an ID that increments by 1 for every unique scoreboard identity. 
+ * We map this ID to a dummy scoreboard with the ID as the score and display name as the player.
+ * Then we store another scoreboard attached directly to the player identity with the matching ID.
+ * We use the ID to cross map the dummy scoreboard ID to the ID of the actual identity.
+ */
