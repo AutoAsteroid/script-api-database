@@ -144,7 +144,7 @@ export function getObjective(objective, displayName = null) {
     const cachedObjective = OBJECTIVE_CACHE[objective];
     if (cachedObjective && cachedObjective.isValid) return cachedObjective;
 
-    // Cache a valid reference or create it if the objective does nto exist
+    // Cache a valid reference or create it if the objective does not exist
     const scoreboard = 
         world.scoreboard.getObjective(objective) ?? 
         world.scoreboard.addObjective(objective, displayName);
@@ -166,5 +166,5 @@ export function resetObjective(objective) {
     return world.scoreboard.addObjective(objective, display);
 }
 
-// Attach objective helper function access to world.objective to use anywhere
+// Attach objective helper function access to world.objectives to use anywhere
 world.objectives = { get: getObjective, reset: resetObjective };
