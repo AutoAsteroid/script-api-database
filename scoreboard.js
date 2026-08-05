@@ -259,7 +259,7 @@ export function getPlayerScoreboardIdentity(username) {
 
 /**
  * Attach objective helper function access to world.objectives to use anywhere.
- * Not to be confused with world.scoreboard objective functions.
+ * Not to be confused with native world.scoreboard objective functions.
  */
 world.objectives = {
     get: getObjective, reset: resetObjective,

@@ -1,4 +1,4 @@
-import { Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
+import { world, Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
 
 /**
  * Proxy object for dynamic, lazy property style scoreboard scores access.
@@ -122,3 +122,36 @@ export function getPlayerNameParticipantMap(): Record<string, ScoreboardIdentity
  * @returns Scoreboard wrapper instance, null if the username is invalid.
  */
 export function getPlayerScoreboardIdentity(username: string): EntityScoreboard | null;
+
+/**
+ * Interface definition for our import("@minecraft/server").world.objectives property extension.
+ * Not to be confused with native world.scoreboard objective functions.
+ */
+export interface WorldObjectivesExtension {
+    /** Gets a cached ScoreboardObjective, creating it if it doesn't exist yet. */
+    get: typeof getObjective;
+
+    /** Resets and recreates a ScoreboardObjective. */
+    reset: typeof resetObjective;
+
+    /** Gets an EntityScoreboard wrapper for any player by username, even if offline. */
+    identity: typeof getPlayerScoreboardIdentity;
+
+    /** Returns a map of all recorded usernames to their ScoreboardIdentity instances. */
+    participantMap: typeof getPlayerNameParticipantMap;
+
+    /** Returns a map of scoreboardIdentity.id numbers to player display names. */
+    playerNamesMap: typeof getScoreboardIdPlayerNameMap;
+}
+
+declare module "@minecraft/server" {
+    interface Entity {
+        /** Custom EntityScoreboard instance bound lazily to this entity. */
+        readonly scores: EntityScoreboard;
+    }
+
+    interface world {
+        /** Custom cached objective manager and offline player scoreboard lookups. */
+        readonly objectives: WorldObjectivesExtension;
+    }
+}
