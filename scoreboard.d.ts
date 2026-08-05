@@ -1,4 +1,4 @@
-import { world, Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
+import { Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
 
 /**
  * Proxy object for dynamic, lazy property style scoreboard scores access.
