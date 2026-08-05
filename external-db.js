@@ -86,8 +86,22 @@ async function deleteJSON(file) {
 }
 
 // Attach external database access to system.database to use anywhere
-system.database = { load: loadJSON, save: saveJSON, delete: deleteJSON };
+Object.defineProperty(system, "database", {
+    value: Object.freeze({
+        load: loadJSON,
+        save: saveJSON,
+        delete: deleteJSON
+    }),
+    writable: false,
+    enumerable: true,
+    configurable: true
+});
 
 // Alias names points directly to the system.database function object
-system.db = system.database;
-system.external = system.database;
+Object.defineProperty(system, "db", {
+    get() {
+        return system.database;
+    },
+    enumerable: true,
+    configurable: true
+});
