@@ -258,16 +258,22 @@ export function getPlayerScoreboardIdentity(username) {
 }
 
 /**
- * Attach objective helper function access to world.objectives to use anywhere.
+ * Attach objectives helper function access to world.objectives to use anywhere.
  * Not to be confused with native world.scoreboard objective functions.
  */
-world.objectives = {
-    get: getObjective, reset: resetObjective,
-    
-    // Enables getting EntityScoreboard of any player, even if offline
-    identity: getPlayerScoreboardIdentity,
+Object.defineProperty(world, "objectives", {
+    value: Object.freeze({
+        get: getObjective,
+        reset: resetObjective,
 
-    // Mapping functions to access even all offline player identities
-    participantMap: getPlayerNameParticipantMap,
-    playerNamesMap: getScoreboardIdPlayerNameMap
-};
+        // Enables getting EntityScoreboard of any player, even if offline
+        identity: getPlayerScoreboardIdentity,
+
+        // Mapping functions to access even all offline player identities
+        participantMap: getPlayerNameParticipantMap,
+        playerNamesMap: getScoreboardIdPlayerNameMap
+    }),
+    writable: false,
+    enumerable: true,
+    configurable: true
+});
