@@ -1,6 +1,6 @@
 # 💾 Script API Database
 
-A high-performance, light-memory database and scoreboard wrapper for Minecraft Bedrock's Script API (`@minecraft/server`). Built with zero-copy payload chunking, self-overwriting lazy getters, offline scoreboard cross-mapping, and automated JSON serialization. Packed with an additional external local JSON file database written in Go using `@minecraft/server-net`.
+A high-performance, light-memory dynamic property database and scoreboard wrapper for Minecraft Bedrock's Script API (`@minecraft/server`). Built with zero-copy payload chunking, self-overwriting lazy getters, offline scoreboard cross-mapping, and automated JSON serialization. Packed with an additional external local JSON file database written in Go using `@minecraft/server-net`.
 
 ---
 
@@ -42,69 +42,18 @@ import "./path/to/external-db.js";
 
 ## 📖 API Reference
 
-### `database.get(name, [initial = {}])`
+### Dynamic Properties (`world.database` / `entity.database`)
+* **`.get(name, initial = {})`** : `any` — Reads a dynamic property from cache or reassembles it.
+* **`.set(name, data)`** : `any` — Serializes data to JSON and saves it (auto-chunks if >32,767 chars).
+* **`.has(name)`** : `boolean` — Checks if key exists in memory cache or native dynamic properties.
+* **`.delete(name)`** : `boolean` — Removes key and all associated chunk partitions from storage and cache.
+* **`.keys()`** : `string[]` — Returns an array of all dynamic property keys stored on the target.
+* **`.size()`** : `number` — Returns total byte footprint of all properties on the target.
 
-Gets a property from cache. If uncached, reads and reassembles dynamic property chunks from Bedrock storage.
-
-* **`name`** `(string)`: Key name.
-* **`initial`** `(any, optional)`: Default fallback value if key doesn't exist.
-* **Returns:** `any`
-
-### `database.set(name, data)`
-
-Serializes data to JSON and saves it. Automatically partitions data into chunks if over 32,767 characters.
-
-* **`name`** `(string)`: Key name.
-* **`data`** `(any)`: Data to store.
-* **Returns:** `any`
-
-### `database.has(name)`
-
-Checks if a key exists in memory cache or in Bedrock's native dynamic properties.
-
-* **`name`** `(string)`: Key name.
-* **Returns:** `boolean`
-
-### `database.delete(name)`
-
-Deletes the key and all chunk partitions from native dynamic properties in a single batch call, then evicts it from memory cache.
-
-* **`name`** `(string)`: Key name.
-* **Returns:** `boolean`
-
-### `database.keys()`
-
-Returns all dynamic property identifier keys stored on the target.
-
-* **Returns:** `Array<string>`
-
-### `database.size()`
-
-Returns the total byte size used by all dynamic properties on the target.
-
-* **Returns:** `number`
-
-### `await system.database.load(file)`
-
-Reads from a JSON file stored in the external local JSON data folder.
-
-* **`file`** `(string)`: The file identifier path.
-* **Returns:** `any`
-
-### `await system.database.save(file, data)`
-
-Writes to a JSON file stored in the external local JSON data folder.
-
-* **`file`** `(string)`: The file identifier path.
-* **`data`** `(any)`: Data to store.
-* **Returns:** `boolean`
-
-### `await system.database.delete(file)`
-
-Deletes a JSON file stored in the external local JSON data folder.
-
-* **`file`** `(string)`: The file identifier path.
-* **Returns:** `boolean`
+### External Local Storage (`system.database`)
+* **`await .load(file)`** : `Promise<any>` — Reads data from a JSON file via the Go bridge.
+* **`await .save(file, data)`** : `Promise<boolean>` — Writes data to a JSON file via the Go bridge.
+* **`await .delete(file)`** : `Promise<boolean>` — Deletes a JSON file via the Go bridge.
 
 ### 💡Example Usage: [examples.js](./examples.js)
 
