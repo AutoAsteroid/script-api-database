@@ -117,6 +117,27 @@ export class EntityScoreboard {
 }
 
 /**
+ * Attach a self-overwriting lazy getter to Entity prototypes for seamless usage using lazy 
+ * initialization to run only once per object instance. Similar to what database.js does.
+ */
+Object.defineProperty(Entity, "scores", {
+    get() {
+        const scoreboard = new EntityScoreboard(this);
+
+        // Overwrite "scores" on THIS INSTANCE with the static class instance
+        Object.defineProperty(this, "scores", {
+            value: scoreboard,
+            writable: false,
+            configurable: true
+        });
+
+        return scoreboard;
+    },
+    // Allows the prototype getter to be overwritten by the instance above
+    configurable: true
+});
+
+/**
  * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
  * Direct world.scoreboard.getObjective() calls are about 100ms slower for every 10000~ calls. 
  */
