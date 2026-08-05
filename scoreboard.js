@@ -3,6 +3,8 @@ import { world, Entity, ScoreboardIdentity } from "@minecraft/server";
 /**
  * Entity scoreboard wrapper class implementation that supports native Entity.scores usage and most
  * importantly, the ability to manage offline player scoreboards with their corresponding username.
+ * 
+ * For example, player.scores and world.objectives.identity(username) return the same thing.
  */
 
 export class EntityScoreboard {
@@ -260,10 +262,9 @@ export function getPlayerScoreboardIdentity(username) {
  * Not to be confused with world.scoreboard objective functions.
  */
 world.objectives = {
-    get: getObjective, 
-    reset: resetObjective,
+    get: getObjective, reset: resetObjective,
     
-    // Essentially enables getting EntityScoreboard of an offline player
+    // Enables getting EntityScoreboard of any player, even if offline
     identity: getPlayerScoreboardIdentity,
 
     // Mapping functions to access even all offline player identities
