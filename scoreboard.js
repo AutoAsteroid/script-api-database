@@ -1,20 +1,48 @@
 import { world } from "@minecraft/server";
 
-// For primitive things like stats, native scoreboards are MUCH better than dynamic property objects
-
 /**
  * In memory cache for all get() calls instead of always calling ScoreboardObjective.getScore()
- * There is no eviction policy in place besides when a player leaves the server.
+ * There is no cache eviction policy in place besides when a player leaves the server.
  */
 export const SCORES_CACHE = {};
 
 export class EntityScoreboard {
-    constructor() {
+    /**
+     * A simple cached scoreboard objective score class wrapper for Entity and Player instances.
+     * @param {Entity | ScoreboardIdentity} participant Scoreboard participant entry to manage.
+     */
+    constructor(participant) {
+        this.participant = participant;
+        this.id = participant.id;
 
+        this.cache = SCORES_CACHE[this.id] ??= {}; // Initialize scoreboard memory cache
     }
 
-    get() {
+    /**
+     * Returns the scoreboard value for this Entity scoreboard, or 0 if they don't have a score.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns {number} Scoreboard score value for the participant of the fetched objective.
+     */
+    get(objective) {
+        try {
+            // scoreboard.getScore() can sometimes, rarely throw errors 
+            const scoreboard = getObjective(objective);
+            return scoreboard.getScore(this.participant) ?? 0;
+        } catch {
+            return 0;
+        }
+    }
 
+    /**
+     * Creates a dynamic scoreboard proxy object for this participant for heavy scoreboard.get().
+     * @returns {Object} Returns a proxy with dynamically fetched get scores. 
+     * @example const { money, kills, deaths } = player.scores.fetch();
+     */
+    fetch() {
+        // Implicitly return an object of all scoreboard values if accessed.
+        return new Proxy({}, {
+            get: (_, objective) => getScore(this.participant, objective)
+        });
     }
 
     set() {
