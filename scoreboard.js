@@ -230,11 +230,30 @@ export function getPlayerNameParticipantMap() {
     const playerNameMap = getScoreboardIdPlayerNameMap();
     // { scoreboardIdentity.id: "AutoAsteroid" }
     
-    const scoreboardIds = getObjective("#SCOREBOARD_ID");
-    const participantMap = scoreboardIds
+    const scoreboardID = getObjective("#SCOREBOARD_ID");
+    const participantMap = scoreboardID
         .getParticipants()
         .map(scoreboard => [ playerNameMap[scoreboard.id], scoreboard ]);
 
     // { "AutoAsteroid": scoreboardIdentity }
     return Object.fromEntries(participantMap);
+}
+
+/**
+ * Gets a scoreboard wrapper instance for the specified username, whether or not they are offline.
+ * @param {string} username The username of the player scoreboard to get from.
+ * @returns {EntityScoreboard|null} Scoreboard wrapper instance, null if the username is invalid.
+ */
+export function getPlayerScoreboardIdentity(username) {
+    // Direct call to get the matching scoreboard identity ID for this username
+    const usernamesMap = getObjective("#USERNAMES_MAP");
+    const identityID = usernamesMap.getScore(username); 
+    
+    // There is no native method to get ScoreboardIdentity from ID so we must do a linear search
+    const scoreboardID = getObjective("#SCOREBOARD_ID");
+    const participants = scoreboardID.getParticipants();
+    const participant = participants.find(({ id }) => id === identityID);
+
+    if (participant === undefined) return null;
+    else return new EntityScoreboard(participant);
 }
