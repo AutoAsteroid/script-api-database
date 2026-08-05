@@ -55,6 +55,16 @@ import "./path/to/external-db.js";
 * **`await .save(file, data)`** : `Promise<boolean>` — Writes data to a JSON file via the Go bridge.
 * **`await .delete(file)`** : `Promise<boolean>` — Deletes a JSON file via the Go bridge.
 
+### Entity Scoreboards (`Entity.scores`)
+* **`.get(objective)`** : `number` — Gets the score value for target objective (defaults to `0` if unset).
+* **`.has(objective)`** : `boolean` — Checks if the player has an entry in this scoreboard objective.
+* **`.set(objective, score)`** : `void` — Sets a score value, removing it if `null` or `undefined`.
+* **`.add(objective, amount)`** : `number` — Increments target score by amount and returns updated total.
+* **`.remove(objective, amount)`** : `number` — Decrements target score by amount and returns updated total.
+* **`.reset(objective)`** : `boolean` — Resets the target entry from this scoreboard objective.
+* **`.fetch()`** : `Proxy` — Returns a dynamic JS Proxy for reading scores directly as object properties.
+* **`.clear()`** : `number` — Removes this scoreboard identity from all scoreboard objectives.
+
 ### 💡Example Usage: [examples.js](./examples.js)
 
 ---
