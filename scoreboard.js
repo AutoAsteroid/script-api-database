@@ -1,4 +1,4 @@
-import { world } from "@minecraft/server";
+import { world, Entity, ScoreboardIdentity } from "@minecraft/server";
 
 /**
  * In memory cache for all get() calls instead of always calling ScoreboardObjective.getScore()
@@ -147,6 +147,12 @@ Object.defineProperty(Entity, "scores", {
     // Allows the prototype getter to be overwritten by the instance above
     configurable: true
 });
+
+/**
+ * Scoreboard score cache eviction policy ONLY when they leave the server. All values will need
+ * to be recached once they are first accessed again when the player joins the server.
+ */
+world.beforeEvents.playerLeave.subscribe(({ player }) => delete SCORES_CACHE[player.id]);
 
 /**
  * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
