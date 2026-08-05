@@ -1,5 +1,10 @@
 import { world, Entity, ScoreboardIdentity } from "@minecraft/server";
 
+/**
+ * Entity scoreboard wrapper class implementation that supports native Entity.scores usage and most
+ * importantly, the ability to manage offline player scoreboards with their corresponding username.
+ */
+
 export class EntityScoreboard {
     /**
      * A simple scoreboard objective class wrapper for Entity and Player scoreboard instances.
@@ -191,7 +196,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
     usernamesMap.getScores()
         .filter(({ score }) => score === player.scoreboardIdentity.id)
         .forEach(({ participant }) => usernamesMap.removeParticipant(participant));
-        
+
     usernamesMap.setScore(player.name, player.scoreboardIdentity.id);
 });
 
@@ -201,3 +206,35 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
  * Then we store another scoreboard attached directly to the player identity with the matching ID.
  * We use the ID to cross map the dummy scoreboard ID to the ID of the actual identity.
  */
+
+/**
+ * Returns an object record matching all player ScoreboardIdentity.id to their player names.
+ * @returns {Object<number, string>} For example: { scoreboardIdentity.id: "AutoAsteroid" }
+ */
+export function getScoreboardIdPlayerNameMap() {
+    // The score value in usernamesMap is actually the scoreboardIdentity.id
+    const usernamesMap = getObjective("#USERNAMES_MAP");
+    const scoreboardIdPlayerNameMap = usernamesMap
+        .getScores()
+        .map(({ score, participant }) => [ score, participant.displayName ]);
+    
+    // { scoreboardIdentity.id: "AutoAsteroid" }
+    return Object.fromEntries(scoreboardIdPlayerNameMap);
+}
+
+/**
+ * Returns an object record matching all player names to their corresponding ScoreboardIdentity.
+ * @returns {Object<string, ScoreboardIdentity>} For example: { "AutoAsteroid": participant }
+ */
+export function getPlayerNameParticipantMap() {
+    const playerNameMap = getScoreboardIdPlayerNameMap();
+    // { scoreboardIdentity.id: "AutoAsteroid" }
+    
+    const scoreboardIds = getObjective("#SCOREBOARD_ID");
+    const participantMap = scoreboardIds
+        .getParticipants()
+        .map(scoreboard => [ playerNameMap[scoreboard.id], scoreboard ]);
+
+    // { "AutoAsteroid": scoreboardIdentity }
+    return Object.fromEntries(participantMap);
+}
