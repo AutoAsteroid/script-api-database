@@ -110,7 +110,7 @@ export class EntityScoreboard {
  * Attach a self-overwriting lazy getter to Entity prototypes for seamless usage using lazy 
  * initialization to run only once per object instance. Similar to what database.js does.
  */
-Object.defineProperty(Entity, "scores", {
+Object.defineProperty(Entity.prototype, "scores", {
     get() {
         const scoreboard = new EntityScoreboard(this);
 

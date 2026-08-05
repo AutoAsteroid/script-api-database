@@ -47,7 +47,7 @@ async function saveJSON(file, data) {
     request.method = HttpRequestMethod.Post;
 
     // Go does not need to do any parsing on the actual JSON data
-    request.body = JSON.stringify(data); 
+    request.body = JSON.stringify(data, null, 4); 
     request.headers = [
         new HttpHeader("Content-Type", "application/json"),
         new HttpHeader("auth", AUTH_TOKEN),
