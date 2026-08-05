@@ -1,4 +1,4 @@
-import { world, Entity, ScoreboardIdentity } from "@minecraft/server";
+import { world, Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
 
 /**
  * Entity scoreboard wrapper class implementation that supports native Entity.scores usage and most
@@ -101,7 +101,7 @@ export class EntityScoreboard {
 
     /**
      * Clears this scoreboard identity entirely across from all scoreboard objectives.
-     * @returns {number} The number of scoreboard entries this participant had to remove.
+     * @returns {number} The number of scoreboard entries this participant removed.
      */
     clear() {
         let reseted = 0;

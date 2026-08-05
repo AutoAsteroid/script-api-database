@@ -30,10 +30,6 @@ export interface ExternalDatabase {
     delete(file: string): Promise<boolean>;
 }
 
-// ------------------------------------------------------------------------------
-// Decorates Bedrock's native `system` instance with .database, .db, and .external
-// ------------------------------------------------------------------------------
-
 declare module "@minecraft/server" {
     interface system {
         /** External HTTP local JSON database file bridge. */

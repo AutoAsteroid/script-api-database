@@ -67,10 +67,6 @@ export default class Database {
     size(): number;
 }
 
-// ------------------------------------------------------------------------------
-// Decorates Bedrock's native world and Entity interfaces with .database / .db
-// ------------------------------------------------------------------------------
-
 declare module "@minecraft/server" {
     interface world {
         /** Memory cached world dynamic property database wrapper. */
