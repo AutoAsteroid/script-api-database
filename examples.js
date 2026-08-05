@@ -7,6 +7,7 @@ import { world, system } from "@minecraft/server";
 
 import "./path/to/database.js";
 import "./path/to/external-db.js";      // Only if you are going to use it
+import "./path/to/scoreboard.js";
 
 /**
  * BASIC READING AND WRITING TO WORLD OR ENTITIES
@@ -97,3 +98,18 @@ const saved = await system.database.save("blacklist", blacklist);
 const stats = { money: 0, kills: 0, deaths: 0 };
 await system.database.save(`stats/${player.name}`, stats);
 await system.database.delete(`stats/${player.name}`);
+
+/**
+ * SCOREBOARD CLASS WRAPPER GENERAL USAGE
+ * We don't cache score values because there will be an inconsistency between Minecraft
+ * and the score cache if we ever make modifications outside our EntityScoreboard class.
+ * Minecraft remains the single source of truth whenever .getScore() is called.
+ */
+
+const { money, kills, deaths } = player.scores.fetch();
+
+const newKillCount = player.scores.add("kills", 1);
+const playTime = player.scores.get("playTime");
+
+const eventScoreboard = world.objectives.get("events");     // Native ScoreboardObjective
+const counter = eventScoreboard.getScore("My Event");

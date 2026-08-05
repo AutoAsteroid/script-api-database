@@ -167,4 +167,4 @@ export function resetObjective(objective) {
 }
 
 // Attach objective helper function access to world.objective to use anywhere
-world.objective = { get: getObjective, reset: resetObjective };
+world.objectives = { get: getObjective, reset: resetObjective };
