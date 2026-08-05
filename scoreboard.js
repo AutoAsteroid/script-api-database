@@ -32,7 +32,7 @@ export class EntityScoreboard {
      */
     fetch() {
         // Implicitly return an object of all scoreboard values if accessed directly
-        return new Proxy({}, { get: (_, objective) => getScore(objective) });
+        return new Proxy({}, { get: (_, objective) => this.get(objective) });
     }
 
     /**
