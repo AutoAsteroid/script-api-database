@@ -65,6 +65,13 @@ import "./path/to/external-db.js";
 * **`.fetch()`** : `Proxy` — Returns a dynamic JS Proxy for reading scores directly as object properties.
 * **`.clear()`** : `number` — Removes this scoreboard identity from all scoreboard objectives.
 
+### Objective Utilities (`world.objectives`)
+* **`.get(objective, displayName?)`** : `ScoreboardObjective` — Returns a cached native objective.
+* **`.reset(objective)`** : `ScoreboardObjective` — Clears all objective entries by deleting and recreating it.
+* **`.identity(username)`** : `EntityScoreboard | null` — Resolves any player scoreboard by username.
+* **`.participantMap()`** : `Record<string, ScoreboardIdentity>` — Map of player names to participants.
+* **`.playerNamesMap()`** : `Record<number, string>` — Map of `scoreboardIdentity.id` to player names.
+
 ### 💡Example Usage: [examples.js](./examples.js)
 
 ---
