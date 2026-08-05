@@ -53,9 +53,9 @@ import "./path/to/external-db.js";
 * **`.size()`** : `number` — Returns total byte footprint of all properties on the target.
 
 ### External Local Storage (`system.database`)
-* **`await .load(file)`** : `Promise<any>` — Reads data from a JSON file via the Go bridge.
-* **`await .save(file, data)`** : `Promise<boolean>` — Writes data to a JSON file via the Go bridge.
-* **`await .delete(file)`** : `Promise<boolean>` — Deletes a JSON file via the Go bridge.
+* **`.load(file)`** : `Promise<any>` — Reads data from an external JSON file via the Go bridge.
+* **`.save(file, data)`** : `Promise<boolean>` — Writes data to an external JSON file via the Go bridge.
+* **`.delete(file)`** : `Promise<boolean>` — Deletes an external JSON file via the Go bridge.
 
 ### Entity Scoreboards (`Entity.scores`)
 * **`.get(objective)`** : `number` — Gets the score value for target objective (defaults to `0` if unset).
