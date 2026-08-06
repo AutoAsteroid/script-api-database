@@ -178,3 +178,6 @@ for (const Prototype of [ Entity.prototype, world ]) {
  * 
  * Player extends Entity in native @minecraft/server, so players automatically inherit this.
  */
+
+// Eviction policy for database cache when players they leave the server to not leak memory
+world.afterEvents.playerLeave.subscribe(({ playerId }) => delete DATABASE_CACHE[playerId]);
