@@ -174,6 +174,12 @@ export function resetObjective(objective) {
 }
 
 /**
+ * Used to cache all ScoreboardIdentity IDs to their ScoreboardIdentity the first time an
+ * offline player is fetched. Cache warming on playerSpawn to never need to loop this again. 
+ */
+export const IDENTITY_CACHE = new Map();
+
+/**
  * This clever cross mapping implementation makes it possible to access offline player scoreboards
  * based off their username. ScoreboardIdentity always lives in the server, however accessing
  * the correct corresponding participant identity of an offline player is a bit tricky.
@@ -197,6 +203,9 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
         .forEach(({ participant }) => usernamesMap.removeParticipant(participant));
 
     usernamesMap.setScore(player.name, player.scoreboardIdentity.id);
+
+    // Cache warming because there is no native method to get scoreboardIdentity from ID
+    IDENTITY_CACHE.set(player.scoreboardIdentity.id, player.scoreboardIdentity);
 });
 
 /**
@@ -246,15 +255,24 @@ export function getPlayerNameParticipantMap() {
 export function getPlayerScoreboardIdentity(username) {
     // Direct call to get the matching scoreboard identity ID for this username
     const usernamesMap = getObjective("#USERNAMES_MAP");
-    const identityID = usernamesMap.getScore(username); 
+    const identityID = usernamesMap.getScore(username);
+    if (identityID === undefined) return null;
+
+    // This should always early return after our first initial function call
+    if (IDENTITY_CACHE.has(identityID))
+        return new EntityScoreboard(IDENTITY_CACHE.get(identityID));
     
-    // There is no native method to get ScoreboardIdentity from ID so we must do a linear search
+    // There is no native method to get ScoreboardIdentity from ID so we must do an O(n) loop
     const scoreboardID = getObjective("#SCOREBOARD_ID");
     const participants = scoreboardID.getParticipants();
-    const participant = participants.find(({ id }) => id === identityID);
+    
+    for (const participant of participants)
+        IDENTITY_CACHE.set(participant.id, participant);
 
-    if (participant === undefined) return null;
-    else return new EntityScoreboard(participant);
+    // Should always be valid because the early return on usernamesMap unless external tampering
+    const identity = IDENTITY_CACHE.get(identityID);
+    if (identity === undefined) return null;
+    else return new EntityScoreboard(IDENTITY_CACHE.get(identityID));
 }
 
 /**

@@ -117,6 +117,12 @@ export function getScoreboardIdPlayerNameMap(): Record<number, string>;
 export function getPlayerNameParticipantMap(): Record<string, ScoreboardIdentity>;
 
 /**
+ * Used to cache all ScoreboardIdentity IDs to their ScoreboardIdentity the first time an
+ * offline player is fetched. Cache warming on playerSpawn to never need to loop this again. 
+ */
+export const IDENTITY_CACHE: Record<number, ScoreboardIdentity>;
+
+/**
  * Gets a scoreboard wrapper instance for the specified username, whether or not they are offline.
  * @param username The username of the player scoreboard to get from.
  * @returns Scoreboard wrapper instance, null if the username is invalid.
