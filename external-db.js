@@ -1,4 +1,4 @@
-import { system } from "@minecraft/server";
+import { System } from "@minecraft/server";
 import { http, HttpRequest, HttpRequestMethod, HttpHeader } from "@minecraft/server-net";
 
 /**
@@ -86,7 +86,7 @@ async function deleteJSON(file) {
 }
 
 // Attach external database access to system.database to use anywhere
-Object.defineProperty(system, "database", {
+Object.defineProperty(System.prototype, "database", {
     value: Object.freeze({
         load: loadJSON,
         save: saveJSON,
@@ -98,7 +98,7 @@ Object.defineProperty(system, "database", {
 });
 
 // Alias names points directly to the system.database function object
-Object.defineProperty(system, "db", {
+Object.defineProperty(System.prototype, "db", {
     get() {
         return system.database;
     },

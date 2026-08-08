@@ -1,4 +1,4 @@
-import { world, Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
+import { world, World, Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
 
 /**
  * Entity scoreboard wrapper class implementation that supports native Entity.scores usage and most
@@ -261,7 +261,7 @@ export function getPlayerScoreboardIdentity(username) {
  * Attach objectives helper function access to world.objectives to use anywhere.
  * Not to be confused with native world.scoreboard objective functions.
  */
-Object.defineProperty(world, "objectives", {
+Object.defineProperty(World.prototype, "objectives", {
     value: Object.freeze({
         get: getObjective,
         reset: resetObjective,

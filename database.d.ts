@@ -1,10 +1,10 @@
-import { world, Entity, Player } from "@minecraft/server";
+import { World, Entity, Player } from "@minecraft/server";
 
 export default class Database {
     /**
      * Target instance supporting native dynamic property methods (world | Entity | Player).
      */
-    readonly target: world | Entity | Player;
+    readonly target: World | Entity | Player;
     /**
      * Unique string identifier for the target instance used for the memory cache bucket.
      * Entity.id string for Entity | Player, and "world" for import("@minecraft/server").world.
@@ -20,7 +20,7 @@ export default class Database {
      * A simple cached dynamic property database class wrapper for world and Entity instances.
      * @param target The target instance holding dynamic properties.
      */
-    constructor(target: world | Entity | Player);
+    constructor(target: World | Entity | Player);
 
     /**
      * Fetches the existence of a dynamic property in the dynamic properties of this instance.
@@ -68,7 +68,7 @@ export default class Database {
 }
 
 declare module "@minecraft/server" {
-    interface world {
+    interface World {
         /** Memory cached world dynamic property database wrapper. */
         readonly database: Database;
         /** Memory cached world dynamic property database wrapper. */

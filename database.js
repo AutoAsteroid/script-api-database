@@ -1,4 +1,4 @@
-import { world, Entity } from "@minecraft/server";
+import { world, World, Entity } from "@minecraft/server";
 
 /**
  * This cache will hold our data from our database calls in memory to avoid unneeded reparsing
@@ -128,7 +128,7 @@ export default class Database {
  * Attach a self-overwriting lazy getter to Entity and World prototypes for seamless usage:
  */
 
-for (const Prototype of [ Entity.prototype, world ]) {
+for (const Prototype of [ Entity.prototype, World.prototype ]) {
     /**
      * LAZY INITIALIZATION & INSTANCE OVERWRITE (Runs ONLY ONCE per object instance):
      * 

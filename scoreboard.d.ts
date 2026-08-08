@@ -150,7 +150,7 @@ declare module "@minecraft/server" {
         readonly scores: EntityScoreboard;
     }
 
-    interface world {
+    interface World {
         /** Custom cached objective manager and offline player scoreboard lookups. */
         readonly objectives: WorldObjectivesExtension;
     }
