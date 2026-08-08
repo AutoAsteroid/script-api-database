@@ -33,8 +33,8 @@ export interface ExternalDatabase {
 declare module "@minecraft/server" {
     interface System {
         /** External HTTP local JSON database file bridge. */
-        database: ExternalDatabase;
+        readonly database: ExternalDatabase;
         /** External HTTP local JSON database file bridge. */
-        db: ExternalDatabase;
+        readonly db: ExternalDatabase;
     }
 }

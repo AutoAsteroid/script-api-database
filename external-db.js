@@ -85,23 +85,25 @@ async function deleteJSON(file) {
     }
 }
 
+// These methods can only be used if external-db.go is also running
+const ExternalDatabase = Object.freeze({
+    load: loadJSON,
+    save: saveJSON,
+    delete: deleteJSON
+});
+
 // Attach external database access to system.database to use anywhere
 Object.defineProperty(System.prototype, "database", {
-    value: Object.freeze({
-        load: loadJSON,
-        save: saveJSON,
-        delete: deleteJSON
-    }),
+    value: ExternalDatabase,
     writable: false,
     enumerable: true,
-    configurable: true
+    configurable: false
 });
 
 // Alias names points directly to the system.database function object
 Object.defineProperty(System.prototype, "db", {
-    get() {
-        return system.database;
-    },
+    value: ExternalDatabase,
+    writable: false,
     enumerable: true,
-    configurable: true
+    configurable: false
 });
