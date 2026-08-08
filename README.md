@@ -71,6 +71,7 @@ import "./path/to/external-db.js";
 * **`.get(objective, displayName?)`** : `ScoreboardObjective` — Returns a cached native objective.
 * **`.reset(objective)`** : `ScoreboardObjective` — Clears all objective entries by deleting and recreating it.
 * **`.identity(username)`** : `EntityScoreboard | null` — Resolves any player scoreboard by username.
+* **`.identityMap()`** : `Map<number, ScoreboardIdentity>` — Map of `scoreboardIdentity.id` to participants.
 * **`.participantMap()`** : `Record<string, ScoreboardIdentity>` — Map of player names to participants.
 * **`.playerNamesMap()`** : `Record<number, string>` — Map of `scoreboardIdentity.id` to player names.
 

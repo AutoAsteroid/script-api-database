@@ -117,4 +117,4 @@ const counter = eventScoreboard.getScore("My Event");
 // Global player scoreboard access, enabling even offline player access
 const offlinePlayer = world.objectives.identity("PlayerName");
 const currentLevel = offlinePlayer.get("level");
-const newPower = offlinePlayer.remove("level", 5);
+const newLevel = offlinePlayer.remove("level", 5);
