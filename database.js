@@ -152,7 +152,7 @@ for (const Prototype of [ Entity.prototype, World.prototype ]) {
             Object.defineProperty(this, "database", {
                 value: database,
                 writable: false,
-                configurable: true
+                configurable: false
             });
 
             return database;

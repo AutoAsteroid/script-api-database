@@ -125,7 +125,7 @@ Object.defineProperty(Entity.prototype, "scores", {
         Object.defineProperty(this, "scores", {
             value: scoreboard,
             writable: false,
-            configurable: true
+            configurable: false
         });
 
         return scoreboard;
@@ -275,5 +275,5 @@ Object.defineProperty(World.prototype, "objectives", {
     }),
     writable: false,
     enumerable: true,
-    configurable: true
+    configurable: false
 });
