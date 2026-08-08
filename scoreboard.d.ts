@@ -148,6 +148,9 @@ export interface WorldObjectivesExtension {
 
     /** Gets an EntityScoreboard wrapper for any player by username, even if offline. */
     identity: typeof getPlayerScoreboardIdentity;
+    
+    /** Returns a map of all scoreboard IDs their ScoreboardIdentity instances. */
+    identityMap: typeof getScoreboardIdentityCache;
 
     /** Returns a map of all recorded usernames to their ScoreboardIdentity instances. */
     participantMap: typeof getPlayerNameParticipantMap;

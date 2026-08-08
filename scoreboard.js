@@ -297,6 +297,7 @@ Object.defineProperty(World.prototype, "objectives", {
 
         // Enables getting EntityScoreboard of any player, even if offline
         identity: getPlayerScoreboardIdentity,
+        identityMap: getScoreboardIdentityCache,
 
         // Mapping functions to access even all offline player identities
         participantMap: getPlayerNameParticipantMap,
