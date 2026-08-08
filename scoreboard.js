@@ -207,7 +207,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
 
     usernamesMap.setScore(player.name, player.scoreboardIdentity.id);
 
-    // Cache warming because there is no native method to get scoreboardIdentity from ID
+    // Cache warming to ensure new IDs don't invalidate the IDENTITY_CACHE
     IDENTITY_CACHE.set(player.scoreboardIdentity.id, player.scoreboardIdentity);
 });
 
@@ -223,7 +223,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
  * @returns {Map<number, ScoreboardIdentity>} Fully warmed scoreboard identity cache for players.
  */
 export function getScoreboardIdentityCache() {
-    // Populate our scoreboardIdentity ID to scoreboardIdentity map
+    // Populate our scoreboardIdentity ID to scoreboardIdentity map only once
     if (!isIdentityCacheFullyWarmed) {
         const scoreboardID = getObjective("#SCOREBOARD_ID");
         const participants = scoreboardID.getParticipants();
@@ -257,16 +257,21 @@ export function getScoreboardIdPlayerNameMap() {
  * @returns {Object<string, ScoreboardIdentity>} For example: { "AutoAsteroid": participant }
  */
 export function getPlayerNameParticipantMap() {
-    const playerNameMap = getScoreboardIdPlayerNameMap();
     // { scoreboardIdentity.id: "AutoAsteroid" }
-    
-    const scoreboardID = getObjective("#SCOREBOARD_ID");
-    const participantMap = scoreboardID
-        .getParticipants()
-        .map(scoreboard => [ playerNameMap[scoreboard.id], scoreboard ]);
+    const playerNameMap = getScoreboardIdPlayerNameMap();
+    const identityCache = getScoreboardIdentityCache();
 
+    const resultingMap = {};
+
+    // Loop through the existing cache to avoid a #SCOREBOARD_ID.getParticipants() engine call
+    for (const id in playerNameMap) {
+        const identity = identityCache.get(Number(id));
+
+        if (identity !== undefined)
+            resultingMap[playerNameMap[id]] = identity;
+    }
     // { "AutoAsteroid": scoreboardIdentity }
-    return Object.fromEntries(participantMap);
+    return resultingMap;
 }
 
 /**
