@@ -152,19 +152,24 @@ for (const Prototype of [ Entity.prototype, World.prototype ]) {
             Object.defineProperty(this, "database", {
                 value: database,
                 writable: false,
+                enumerable: false,
                 configurable: false
             });
 
             return database;
         },
         // Allows the prototype getter to be overwritten by the instance above
-        configurable: true
+        configurable: true,
+        enumerable: false
     });
 
     // Database alias so accessing world/entity.db just reads database property directly
     Object.defineProperty(Prototype, "db", {
-        get() { return this.database; },
-        configurable: true
+        get() { 
+            return this.database;
+        },
+        configurable: true,
+        enumerable: false
     });
 }
 

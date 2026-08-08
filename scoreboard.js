@@ -309,6 +309,6 @@ Object.defineProperty(World.prototype, "objectives", {
         playerNamesMap: getScoreboardIdPlayerNameMap
     }),
     writable: false,
-    enumerable: true,
+    enumerable: false,
     configurable: false
 });

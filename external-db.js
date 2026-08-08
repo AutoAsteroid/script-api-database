@@ -96,7 +96,7 @@ const ExternalDatabase = Object.freeze({
 Object.defineProperty(System.prototype, "database", {
     value: ExternalDatabase,
     writable: false,
-    enumerable: true,
+    enumerable: false,
     configurable: false
 });
 
@@ -104,6 +104,6 @@ Object.defineProperty(System.prototype, "database", {
 Object.defineProperty(System.prototype, "db", {
     value: ExternalDatabase,
     writable: false,
-    enumerable: true,
+    enumerable: false,
     configurable: false
 });
