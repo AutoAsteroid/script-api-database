@@ -105,6 +105,18 @@ export function getObjective(objective: string, displayName?: string | null): Sc
 export function resetObjective(objective: string): ScoreboardObjective;
 
 /**
+ * Used to cache all ScoreboardIdentity IDs to their ScoreboardIdentity the first time an
+ * offline player is fetched. Cache warming on playerSpawn to never need to loop this again. 
+ */
+export const IDENTITY_CACHE: Record<number, ScoreboardIdentity>;
+
+/**
+ * Guarantees the cache is populated and returns it. Runs the O(N) loop at most once per lifecycle.
+ * @returns Fully warmed scoreboard identity cache for players.
+ */
+export function getScoreboardIdentityCache(): Map<number, ScoreboardIdentity>;
+
+/**
  * Returns an object record matching all player ScoreboardIdentity IDs to their player names.
  * @returns Map of { [scoreboardIdentity.id]: "PlayerName" }
  */
@@ -115,12 +127,6 @@ export function getScoreboardIdPlayerNameMap(): Record<number, string>;
  * @returns Map of { ["PlayerName"]: ScoreboardIdentity }
  */
 export function getPlayerNameParticipantMap(): Record<string, ScoreboardIdentity>;
-
-/**
- * Used to cache all ScoreboardIdentity IDs to their ScoreboardIdentity the first time an
- * offline player is fetched. Cache warming on playerSpawn to never need to loop this again. 
- */
-export const IDENTITY_CACHE: Record<number, ScoreboardIdentity>;
 
 /**
  * Gets a scoreboard wrapper instance for the specified username, whether or not they are offline.

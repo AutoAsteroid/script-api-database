@@ -179,6 +179,9 @@ export function resetObjective(objective) {
  */
 export const IDENTITY_CACHE = new Map();
 
+// Internal helper flag to signify the IDENTITY_CACHE is full so we don't populate it again
+let isIdentityCacheFullyWarmed = false;
+
 /**
  * This clever cross mapping implementation makes it possible to access offline player scoreboards
  * based off their username. ScoreboardIdentity always lives in the server, however accessing
@@ -214,6 +217,25 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
  * Then we store another scoreboard attached directly to the player identity with the matching ID.
  * We use the ID to cross map the dummy scoreboard ID to the ID of the actual identity.
  */
+
+/**
+ * Guarantees the cache is populated and returns it. Runs the O(N) loop at most once per lifecycle.
+ * @returns {Map<number, ScoreboardIdentity>} Fully warmed scoreboard identity cache for players.
+ */
+export function getScoreboardIdentityCache() {
+    // Populate our scoreboardIdentity ID to scoreboardIdentity map
+    if (!isIdentityCacheFullyWarmed) {
+        const scoreboardID = getObjective("#SCOREBOARD_ID");
+        const participants = scoreboardID.getParticipants();
+
+        for (const participant of participants)
+            IDENTITY_CACHE.set(participant.id, participant);
+
+        isIdentityCacheFullyWarmed = true;
+    }
+    // This cache is needed because there is no native method to get ScoreboardIdentity from ID
+    return IDENTITY_CACHE;
+}
 
 /**
  * Returns an object record matching all player ScoreboardIdentity IDs to their player names.
@@ -258,19 +280,8 @@ export function getPlayerScoreboardIdentity(username) {
     const identityID = usernamesMap.getScore(username);
     if (identityID === undefined) return null;
 
-    // This should always early return after our first initial function call
-    if (IDENTITY_CACHE.has(identityID))
-        return new EntityScoreboard(IDENTITY_CACHE.get(identityID));
-    
-    // There is no native method to get ScoreboardIdentity from ID so we must do an O(n) loop
-    const scoreboardID = getObjective("#SCOREBOARD_ID");
-    const participants = scoreboardID.getParticipants();
-    
-    for (const participant of participants)
-        IDENTITY_CACHE.set(participant.id, participant);
-
-    // Should always be valid because the early return on usernamesMap unless external tampering
-    const identity = IDENTITY_CACHE.get(identityID);
+    // Should always be non null because the early return unless external tampering
+    const identity = getScoreboardIdentityCache().get(identityID);
     if (identity === undefined) return null;
     else return new EntityScoreboard(IDENTITY_CACHE.get(identityID));
 }
@@ -281,8 +292,8 @@ export function getPlayerScoreboardIdentity(username) {
  */
 Object.defineProperty(World.prototype, "objectives", {
     value: Object.freeze({
-        get: getObjective,
-        reset: resetObjective,
+        // Wrapper function extensions for scoreboard objectives
+        get: getObjective, reset: resetObjective,
 
         // Enables getting EntityScoreboard of any player, even if offline
         identity: getPlayerScoreboardIdentity,
