@@ -10,14 +10,90 @@ import { Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/serv
 export type DynamicScoreboardFetch = Record<string, number>;
 
 /**
+ * EntityScoreboard will delegate to call the WorldScoreboard methods with the target parameter
+ * already defined. WorldScoreboard supports string entries and ScoreboardIdentity instances.
+ */
+export class WorldScoreboard {
+    /**
+     * Creates or retrieves an EntityScoreboard instance bound to a specific participant.
+     * @param participant Target identity to bind.
+     * @returns An EntityScoreboard wrapper bound to the target.
+     */
+    for(participant: Entity | ScoreboardIdentity): EntityScoreboard; 
+
+    /**
+     * Returns the scoreboard value for this Entity scoreboard, or 0 if they don't have a score.
+     * @param target Target participant entry.
+     * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns Scoreboard score value for the participant of the fetched objective.
+     */
+    get(objective: string): number;
+
+    /**
+     * Creates a dynamic scoreboard proxy object for this participant for heavy scoreboard.get().
+     * @param target Target participant entry.
+     * @returns Returns a proxy with dynamically fetched get scores. 
+     * @example const { money, kills, deaths, scoreboardObjectiveId } = world.scores.fetch(player);
+     */
+    fetch(target: Entity | ScoreboardIdentity | string): DynamicScoreboardFetch;
+
+    /**
+     * Set the score of this participant for the provided scoreboard objective.
+     * @param target Target participant entry.
+     * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param score New score to be set (removes entry if null or undefined).
+     */
+    set(target: Entity | ScoreboardIdentity | string, objective: string, score: number | undefined | null): void;
+
+    /**
+     * Adds to the score of this participant for the provided scoreboard objective.
+     * @param target Target participant entry.
+     * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param amount Amount to add to the score, either positive or negative.
+     * @returns The new scoreboard value after adding amount to it.
+     */
+    add(target: Entity | ScoreboardIdentity | string, objective: string, amount: number): number;
+
+    /**
+     * Removes from the score of this participant for the provided scoreboard objective.
+     * @param target Target participant entry.
+     * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param amount Amount to remove from the score, either positive or negative.
+     * @returns The new scoreboard value after removing amount from it.
+     */
+    remove(target: Entity | ScoreboardIdentity | string, objective: string, amount: number): number;
+
+    /**
+     * Checks if this participant has an entry in the provided scoreboard objective.
+     * @param target Target participant entry.
+     * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns Whether or not this participant has an entry in this objective.
+     */
+    has(target: Entity | ScoreboardIdentity | string, objective: string): boolean;
+
+    /**
+     * Resets an entry entirely for this participant in the provided scoreboard objective.
+     * @param target Target participant entry.
+     * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns Whether or not there was a scoreboard entry to delete.
+     */
+    reset(target: Entity | ScoreboardIdentity | string, objective: string): boolean;
+
+    /**
+     * Clears this scoreboard identity entirely across from all scoreboard objectives.
+     * @param target Target participant entry.
+     * @returns The number of scoreboard entries this participant removed.
+     */
+    clear(target: Entity | ScoreboardIdentity | string): number;
+}
+
+/**
  * Entity scoreboard wrapper class implementation that supports native Entity.scores usage and most
  * importantly, the ability to manage offline player scoreboards with their corresponding username.
  */
 export class EntityScoreboard {
     /** Target scoreboard participant instance holding the scoreboard entries */
     readonly participant: Entity | ScoreboardIdentity;
-    /** Unique identity ID number for the participant provided by Minecraft */
-    readonly id: number;
 
     /**
      * A simple scoreboard objective class wrapper for Entity and Player scoreboard instances.
@@ -78,7 +154,7 @@ export class EntityScoreboard {
 
     /**
      * Clears this scoreboard identity entirely across from all scoreboard objectives.
-     * @returns {number} The number of scoreboard entries this participant removed.
+     * @returns The number of scoreboard entries this participant removed.
      */
     clear(): number;
 }
@@ -143,7 +219,7 @@ export interface WorldObjectivesExtension {
     /** Gets a cached ScoreboardObjective, creating it if it doesn't exist yet. */
     get: typeof getObjective;
 
-    /** Resets and recreates a ScoreboardObjective. */
+    /** Resets and returns a new recreated ScoreboardObjective. */
     reset: typeof resetObjective;
 
     /** Gets an EntityScoreboard wrapper for any player by username, even if offline. */
@@ -161,12 +237,14 @@ export interface WorldObjectivesExtension {
 
 declare module "@minecraft/server" {
     interface Entity {
-        /** Custom EntityScoreboard instance bound lazily to this entity. */
+        /** Custom EntityScoreboard wrapper instance bound lazily to this entity. */
         readonly scores: EntityScoreboard;
     }
 
     interface World {
-        /** Custom cached objective manager and offline player scoreboard lookups. */
+        /** Custom cached objective manager with offline player scoreboard lookups. */
         readonly objectives: WorldObjectivesExtension;
+        /** World scoreboard wrapper manager supporting all native participant types. */
+        readonly scores: WorldScoreboard;
     }
 }
