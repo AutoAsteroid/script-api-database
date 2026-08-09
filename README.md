@@ -66,7 +66,7 @@ import "./path/to/external-db.js";
 * **`.playerNamesMap()`** : `Record<number, string>` — Map of `scoreboardIdentity.id` to player names.
 
 ### Scoreboard Methods (`world.scores`)
-* **`.for(participant)`** : `EntityScoreboard` — Gets a EntityScoreboard instance for an Entity or ScoreboardIdentity.
+* **`.for(participant)`** : `EntityScoreboard` — Gets a scoreboard wrapper for an Entity or ScoreboardIdentity.
 * **`.get(target, objective)`** : `number` — Gets the score value for target objective (defaults to `0` if unset).
 * **`.has(target, objective)`** : `boolean` — Checks if the player has an entry in this scoreboard objective.
 * **`.set(target, objective, score)`** : `void` — Sets a score value, removing it if `null` or `undefined`.
@@ -78,7 +78,9 @@ import "./path/to/external-db.js";
 
 ### Entity Scoreboards (`entity.scores`)
 
-`entity.scores` provides a bound shorthand for all `world.scores` methods (except `world.scores.for()`) where `target` is implicitly `this` entity. For example, `player.scores.add("kills", 1)` and `world.scores.add(player, "kills", 1)` are functionally the same.
+* **Bound Engine** — Delegates all calls directly to `world.scores` with `target` implicitly set to `this`.
+* **Available Methods** — Mirrors all `world.scores` methods with the exception of `world.scores.for()`.
+* **Example** — `player.scores.add("kills", 1)` and `world.scores.add(player, "kills", 1)` are functionally identical.
 
 ### 💡Example Usage: [examples.js](./examples.js)
 
