@@ -14,7 +14,6 @@ export class EntityScoreboard {
      */
     constructor(participant) {
         this.participant = participant;
-        this.id = participant.id;
     }
 
     /**
@@ -254,6 +253,27 @@ export class WorldScoreboard {
         return reseted;
     }
 }
+
+/**
+ * Attach a self-overwriting lazy getter to World prototype for seamless usage using lazy 
+ * initialization to run only once per server cycle. Similar to what database.js does.
+ */
+Object.defineProperty(World.prototype, "scores", {
+    get() {
+        const scoreboard = new WorldScoreboard();
+
+        // Overwrite "scores" on THIS INSTANCE with the static class instance
+        Object.defineProperty(this, "scores", {
+            value: scoreboard,
+            writable: false,
+            configurable: false
+        });
+
+        return scoreboard;
+    },
+    // Allows the prototype getter to be overwritten by the instance above
+    configurable: true
+});
 
 /**
  * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
