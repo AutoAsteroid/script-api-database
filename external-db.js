@@ -28,7 +28,8 @@ async function loadJSON(file) {
     // Response will be return null if the file does not exist
     try {
         const response = await http.request(request);
-        return JSON.parse(response);
+        if (response.status !== 200) return null;
+        return JSON.parse(response.body);
     } catch {
         return null;
     }
