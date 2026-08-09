@@ -244,7 +244,7 @@ Object.defineProperty(Entity.prototype, "scores", {
 
 /**
  * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
- * Direct world.scoreboard.getObjective() calls are about 100ms slower for every 10000~ calls. 
+ * Direct world.scoreboard.getObjective() calls are about 100ms slower for every 1000~ calls. 
  */
 export const OBJECTIVE_CACHE = {};
 
@@ -322,8 +322,8 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
 /**
  * Every ScoreboardIdentity has an ID that increments by 1 for every unique scoreboard identity. 
  * We map this ID to a dummy scoreboard with the ID as the score and display name as the player.
- * Then we store another scoreboard attached directly to the player identity with the matching ID.
- * We use the ID to cross map the dummy scoreboard ID to the ID of the actual identity.
+ * Then we store another scoreboard attached directly to the player identity with that same ID.
+ * Then we use that ID to cross map the dummy scoreboard ID to the ID of the actual identity.
  */
 
 /**
