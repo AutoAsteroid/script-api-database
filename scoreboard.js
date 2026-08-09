@@ -112,12 +112,12 @@ export class WorldScoreboard {
      * @returns {number} The number of scoreboard entries this participant removed.
      */
     clear(target) {
-        let reseted = 0;
+        let resetCount = 0;
         // JavaScript += will convert removeParticipant's boolean to a 1 or 0 on removal
         for (const objective of world.scoreboard.getObjectives()) {
-            reseted += objective.removeParticipant(target);
+            resetCount += objective.removeParticipant(target);
         }
-        return reseted;
+        return resetCount;
     }
 }
 
@@ -396,7 +396,7 @@ export function getPlayerScoreboardIdentity(username) {
     // Should always be non null because the early return unless external tampering
     const identity = getScoreboardIdentityCache().get(identityID);
     if (identity === undefined) return null;
-    else return new EntityScoreboard(IDENTITY_CACHE.get(identityID));
+    else return new EntityScoreboard(identity);
 }
 
 /**
