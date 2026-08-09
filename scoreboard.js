@@ -135,6 +135,127 @@ Object.defineProperty(Entity.prototype, "scores", {
 });
 
 /**
+ * EntityScoreboard will delegate to call the WorldScoreboard methods with the target parameter
+ * already defined. WorldScoreboard supports string entries and ScoreboardIdentity instances.
+ * This removes duplicate code and keeps WorldScoreboard as the SSOT for easier maintenance.
+ */
+
+export class WorldScoreboard {
+    /**
+     * Creates or retrieves an EntityScoreboard instance bound to a specific participant.
+     * @param {Entity | ScoreboardIdentity} participant Target identity to bind.
+     * @returns {EntityScoreboard} An EntityScoreboard wrapper bound to the target.
+     */
+    for(participant) {
+        return new EntityScoreboard(participant);
+    }
+
+    /**
+     * Returns the scoreboard value for this Entity scoreboard, or 0 if they don't have a score.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns {number} Scoreboard score value for the participant of the fetched objective.
+     */
+    get(target, objective) {
+        try {
+            // scoreboard.getScore() can sometimes, rarely throw errors 
+            const scoreboard = getObjective(objective);
+            return scoreboard.getScore(target) ?? 0;
+        } catch {
+            return 0;
+        }
+    }
+
+    /**
+     * Creates a dynamic scoreboard proxy object for this participant for heavy scoreboard.get().
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @returns {Object} Returns a proxy with dynamically fetched get scores. 
+     * @example const { money, kills, deaths, scoreboardObjectiveId } = player.scores.fetch();
+     */
+    fetch(target) {
+        // Implicitly return an object of all scoreboard values if accessed directly
+        return new Proxy({}, { get: (_, objective) => this.get(target, objective) });
+    }
+
+    /**
+     * Set the score of this participant for the provided scoreboard objective.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param {number | undefined | null} score New score to be set to the participant score.
+     * @returns {void}
+     */
+    set(target, objective, score) {
+        const scoreboard = getObjective(objective);
+        if (!scoreboard) return;
+
+        // Remove the scoreboard participant if the new value is nothing
+        if (score !== 0 && !score)
+            scoreboard.removeParticipant(target);
+        else scoreboard.setScore(target, Math.round(score));
+    }
+
+    /**
+     * Adds to the score of this participant for the provided scoreboard objective.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param {number} amount Amount to add to the score, either positive or negative.
+     * @returns {number} The new scoreboard value after adding amount to it.
+     */
+    add(target, objective, amount) {
+        // Return 0 and do nothing if the passed amount is not a number
+        if (isNaN(amount)) return 0;
+    
+        // Round the scoreboard value before adding to the objective
+        return getObjective(objective).addScore(target, Math.round(amount));
+    }
+
+    /**
+     * Removes from the score of this participant for the provided scoreboard objective.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @param {number} amount Amount to remove from the score, either positive or negative.
+     * @returns {number} The new scoreboard value after removing amount from it.
+     */
+    remove(target, objective, amount) {
+        return this.add(target, objective, -amount);
+    }
+
+    /**
+     * Checks if this participant has an entry in the provided scoreboard objective.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns {boolean} Whether or not this participant has an entry in this objective.
+     */
+    has(target, objective) {
+        return getObjective(objective).hasParticipant(target);
+    }
+
+    /**
+     * Resets an entry entirely for this participant in the provided scoreboard objective.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @param {string} objective String of the scoreboard objective id, e.g.: "kills", "deaths"
+     * @returns {boolean} Whether or not there was a scoreboard entry to delete.
+     */
+    reset(target, objective) {
+        return getObjective(objective).removeParticipant(target);
+    }
+
+    /**
+     * Clears this scoreboard identity entirely across from all scoreboard objectives.
+     * @param {Entity | ScoreboardIdentity | string} target Target participant entry.
+     * @returns {number} The number of scoreboard entries this participant removed.
+     */
+    clear(target) {
+        let reseted = 0;
+        // JavaScript += will convert removeParticipant's boolean to a 1 or 0 on removal
+        for (const objective of world.scoreboard.getObjectives()) {
+            reseted += objective.removeParticipant(target);
+        }
+        return reseted;
+    }
+}
+
+/**
  * Objective cache is used to cache @minecraft/server.ScoreboardObjective instances in memory.
  * Direct world.scoreboard.getObjective() calls are about 100ms slower for every 10000~ calls. 
  */
