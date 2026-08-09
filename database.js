@@ -14,8 +14,7 @@ export default class Database {
      */
     constructor(target) {
         this.target = target;
-        this.id = target.id ?? "world";
-
+        this.id = target.id ?? "#WORLD";
         this.cache = DATABASE_CACHE[this.id] ??= {}; // Initialize target memory cache
     }
 
@@ -73,6 +72,13 @@ export default class Database {
 
         const serialized = JSON.stringify(data);
         const updates = {};
+        const prefix = name + ":";
+
+        // Delete previous chunks in the case our JSON data decreases chunk size
+        for (const key of this.target.getDynamicPropertyIds()) {
+            if (key === name || key.startsWith(prefix))
+                updates[key] = undefined;
+        }
 
         // Unchunked save for strings under Minecraft's 16 bit 32767 character limit
         if (serialized.length <= 32767) {
