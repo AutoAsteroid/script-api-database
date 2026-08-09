@@ -27,7 +27,7 @@ export class WorldScoreboard {
      * @param objective String of the scoreboard objective id, e.g.: "kills", "deaths"
      * @returns Scoreboard score value for the participant of the fetched objective.
      */
-    get(objective: string): number;
+    get(target: Entity | ScoreboardIdentity | string, objective: string): number;
 
     /**
      * Creates a dynamic scoreboard proxy object for this participant for heavy scoreboard.get().

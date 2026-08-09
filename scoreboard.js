@@ -163,13 +163,7 @@ export class EntityScoreboard {
      * @returns {number} Scoreboard score value for the participant of the fetched objective.
      */
     get(objective) {
-        try {
-            // scoreboard.getScore() can sometimes, rarely throw errors 
-            const scoreboard = getObjective(objective);
-            return scoreboard.getScore(this.participant) ?? 0;
-        } catch {
-            return 0;
-        }
+        return world.scores.get(this.participant, objective);
     }
 
     /**
@@ -178,8 +172,7 @@ export class EntityScoreboard {
      * @example const { money, kills, deaths, scoreboardObjectiveId } = player.scores.fetch();
      */
     fetch() {
-        // Implicitly return an object of all scoreboard values if accessed directly
-        return new Proxy({}, { get: (_, objective) => this.get(objective) });
+        return world.scores.fetch(this.participant);
     }
 
     /**
@@ -189,12 +182,7 @@ export class EntityScoreboard {
      * @returns {void}
      */
     set(objective, score) {
-        const scoreboard = getObjective(objective);
-
-        // Remove the scoreboard participant if the new value is nothing
-        if (score !== 0 && !score)
-            scoreboard.removeParticipant(this.participant);
-        else scoreboard.setScore(this.participant, Math.round(score));
+        return world.scores.set(this.participant, objective, score);
     }
 
     /**
@@ -204,11 +192,7 @@ export class EntityScoreboard {
      * @returns {number} The new scoreboard value after adding amount to it.
      */
     add(objective, amount) {
-        // Return 0 and do nothing if the passed amount is not a number
-        if (isNaN(amount)) return 0;
-    
-        // Round the scoreboard value before adding to the objective
-        return getObjective(objective).addScore(this.participant, Math.round(amount));
+        return world.scores.add(this.participant, objective, amount);
     }
 
     /**
@@ -218,7 +202,7 @@ export class EntityScoreboard {
      * @returns {number} The new scoreboard value after removing amount from it.
      */
     remove(objective, amount) {
-        return this.add(objective, -amount);
+        return world.scores.remove(this.participant, objective, amount);
     }
 
     /**
@@ -227,7 +211,7 @@ export class EntityScoreboard {
      * @returns {boolean} Whether or not this participant has an entry in this objective.
      */
     has(objective) {
-        return getObjective(objective).hasParticipant(this.participant);
+        return world.scores.has(this.participant, objective);
     }
 
     /**
@@ -236,7 +220,7 @@ export class EntityScoreboard {
      * @returns {boolean} Whether or not there was a scoreboard entry to delete.
      */
     reset(objective) {
-        return getObjective(objective).removeParticipant(this.participant);
+        return world.scores.reset(this.participant, objective);
     }
 
     /**
@@ -244,12 +228,7 @@ export class EntityScoreboard {
      * @returns {number} The number of scoreboard entries this participant removed.
      */
     clear() {
-        let reseted = 0;
-        // JavaScript += will convert removeParticipant's boolean to a 1 or 0 on removal
-        for (const objective of world.scoreboard.getObjectives()) {
-            reseted += objective.removeParticipant(this.participant);
-        }
-        return reseted;
+        return world.scores.clear(this.participant);
     }
 }
 
