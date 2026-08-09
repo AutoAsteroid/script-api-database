@@ -122,24 +122,13 @@ export class WorldScoreboard {
 }
 
 /**
- * Attach a self-overwriting lazy getter to World prototype for seamless usage using lazy 
- * initialization to run only once per server cycle. Similar to what database.js does.
+ * Always assume a WorldScoreboard instance for world.scores. No lazy initialization like done
+ * with Entity.scores prototypes because there is no per participant state for world.
  */
 Object.defineProperty(World.prototype, "scores", {
-    get() {
-        const scoreboard = new WorldScoreboard();
-
-        // Overwrite "scores" on THIS INSTANCE with the static class instance
-        Object.defineProperty(this, "scores", {
-            value: scoreboard,
-            writable: false,
-            configurable: false
-        });
-
-        return scoreboard;
-    },
-    // Allows the prototype getter to be overwritten by the instance above
-    configurable: true
+    value: new WorldScoreboard(),
+    writable: false,
+    configurable: false
 });
 
 /**
