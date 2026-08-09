@@ -130,19 +130,8 @@ export default class Database {
 
 for (const Prototype of [ Entity.prototype, World.prototype ]) {
     /**
-     * LAZY INITIALIZATION & INSTANCE OVERWRITE (Runs ONLY ONCE per object instance):
-     * 
-     * 1. First Access (Getter Triggered):
-     *      When `target.database` is called for the very first time, the prototype getter fires,
-     *      instantiates new Database(this), and binds it to the specific instance (`this`).
-     * 
-     * 2. Self-Overwriting Property:
-     *      Object.defineProperty(this, "database", ...) defines a flat `value` property 
-     *      directly on the individual instance (`this`), masking this prototype getter.
-     * 
-     * 3. Subsequent Accesses (Zero Overhead):
-     *      All future calls to `target.database` bypass this getter completely and read 
-     *      the stored `Database` instance directly from memory as a plain property lookup.
+     * Laxy initialization and instance overwrite (Runs ONLY ONCE per object instance)
+     * First access instantiates the Database that is reused for all future access.
      */
     Object.defineProperty(Prototype, "database", {
         get() {
@@ -184,5 +173,11 @@ for (const Prototype of [ Entity.prototype, World.prototype ]) {
  * Player extends Entity in native @minecraft/server, so players automatically inherit this.
  */
 
-// Eviction policy for database cache when players they leave the server to not leak memory
-world.afterEvents.playerLeave.subscribe(({ playerId }) => delete DATABASE_CACHE[playerId]);
+// Eviction policy for cache when entities are removed from the server to not leak memory
+world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+    delete DATABASE_CACHE[playerId]
+});
+
+world.afterEvents.entityRemove.subscribe(({ removedEntityId }) => {
+    delete DATABASE_CACHE[removedEntityId]
+});
