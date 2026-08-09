@@ -57,16 +57,6 @@ import "./path/to/external-db.js";
 * **`.save(file, data)`** : `Promise<boolean>` — Writes data to an external JSON file via the Go bridge.
 * **`.delete(file)`** : `Promise<boolean>` — Deletes an external JSON file via the Go bridge.
 
-### Entity Scoreboards (`Entity.scores`)
-* **`.get(objective)`** : `number` — Gets the score value for target objective (defaults to `0` if unset).
-* **`.has(objective)`** : `boolean` — Checks if the player has an entry in this scoreboard objective.
-* **`.set(objective, score)`** : `void` — Sets a score value, removing it if `null` or `undefined`.
-* **`.add(objective, amount)`** : `number` — Increments target score by amount and returns updated total.
-* **`.remove(objective, amount)`** : `number` — Decrements target score by amount and returns updated total.
-* **`.reset(objective)`** : `boolean` — Resets the target entry from this scoreboard objective.
-* **`.fetch()`** : `Proxy` — Returns a dynamic JS Proxy for reading scores directly as object properties.
-* **`.clear()`** : `number` — Removes this scoreboard identity from all scoreboard objectives.
-
 ### Objective Utilities (`world.objectives`)
 * **`.get(objective, displayName?)`** : `ScoreboardObjective` — Returns a cached native objective.
 * **`.reset(objective)`** : `ScoreboardObjective` — Clears all objective entries by deleting and recreating it.
@@ -74,6 +64,26 @@ import "./path/to/external-db.js";
 * **`.identityMap()`** : `Map<number, ScoreboardIdentity>` — Map of `scoreboardIdentity.id` to participants.
 * **`.participantMap()`** : `Record<string, ScoreboardIdentity>` — Map of player names to participants.
 * **`.playerNamesMap()`** : `Record<number, string>` — Map of `scoreboardIdentity.id` to player names.
+
+### Scoreboard Methods (`world.scores`)
+* **`.get(target, objective)`** : `number` — Gets the score value for target objective (defaults to `0` if unset).
+* **`.has(target, objective)`** : `boolean` — Checks if the player has an entry in this scoreboard objective.
+* **`.set(target, objective, score)`** : `void` — Sets a score value, removing it if `null` or `undefined`.
+* **`.add(target, objective, amount)`** : `number` — Increments target score by amount and returns updated total.
+* **`.remove(target, objective, amount)`** : `number` — Decrements target score by amount and returns updated total.
+* **`.reset(target, objective)`** : `boolean` — Resets the target entry from this scoreboard objective.
+* **`.fetch(target)`** : `Proxy` — Returns a dynamic JS Proxy for reading scores directly as object properties.
+* **`.clear(target)`** : `number` — Removes this scoreboard identity from all scoreboard objectives.
+
+### Entity Scoreboards (`entity.scores`)
+
+`entity.scores` provides a bound shorthand for all `world.scores` methods where `target` is implicitly `this` entity. 
+
+```javascript
+// For example, these are functionally the same:
+player.scores.add("kills", 1);
+world.scores.add(player, "kills", 1);
+```
 
 ### 💡Example Usage: [examples.js](./examples.js)
 
