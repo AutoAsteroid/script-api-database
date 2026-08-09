@@ -50,7 +50,7 @@ export default class Database {
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
      * @param name The dynamic property key name saved to delete.
-     * @returns Whether or not the database dynamic property was deleted from CACHE.
+     * @returns Whether or not the database dynamic property existed to delete.
      */
     delete(name: string): boolean;
 

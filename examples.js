@@ -76,8 +76,8 @@ console.warn(retrieved.length); // 100000
  */
 
 // Batch deletes base key + all chunks in 1 native call
-world.database.delete("data"); // true, if deleted from DATABASE_CACHE
-world.database.delete("data"); // false, not in DATABASE_CACHE
+world.database.delete("data"); // true
+world.database.delete("data"); // false
 
 console.warn(world.database.keys()); // String array of property IDs
 console.warn(world.database.size()); // Total byte count used on target

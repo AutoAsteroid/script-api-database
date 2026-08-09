@@ -43,11 +43,13 @@ export default class Database {
         if (this.cache[name] !== undefined) return this.cache[name];
 
         // Return the base key if it exists (raw is <= 32767 characters)
-        const raw = this.target.getDynamicProperty(name);
-        if (raw !== undefined) return this.cache[name] = JSON.parse(raw);
+        const rawString = this.target.getDynamicProperty(name);
+        if (rawString !== undefined) 
+            return this.cache[name] = JSON.parse(rawString);
         
         // Partitioned chunk assembly for values that exceed the character limit
         let fullString = "";
+        
         for (let i = 0;; i++) {
             const chunk = this.target.getDynamicProperty(name + ":" + i);
             if (chunk === undefined) break;
@@ -98,19 +100,26 @@ export default class Database {
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
      * @param {string} name The dynamic property key name saved to delete.
-     * @returns {boolean} Whether or not the database dynamic property was deleted from CACHE.
+     * @returns {boolean} Whether or not the database dynamic property existed to delete.
      */
     delete(name) {
-        const updates = { [name]: undefined };
+        const updates = {};
         const prefix = name + ":";
+        let existed = false;
 
-        // Deletes any partitioned string chunks if they exist
-        for (const key of this.target.getDynamicPropertyIds()) 
-            if (key.startsWith(prefix))
+        // Deletes any base keys or partitioned string chunks if they exist
+        for (const key of this.target.getDynamicPropertyIds()) {
+            if (key === name || key.startsWith(prefix)) {
                 updates[key] = undefined;
+                existed = true;
+            }
+        }
+        // Early return if we couldn't find any keys that matched name
+        if (existed === false) return false;
 
         this.target.setDynamicProperties(updates);
-        return delete this.cache[name];
+        delete this.cache[name];
+        return true;
     }
 
     /**
