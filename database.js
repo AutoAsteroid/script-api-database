@@ -118,7 +118,13 @@ export default class Database {
      * @returns {array<string>} A string array of the dynamic properties set on this instance.
      */
     keys() {
-        return this.target.getDynamicPropertyIds();
+        const logicalKeys = new Set();
+
+        // Strip all trailing chunk suffixes from large data like ":0", ":1"
+        for (const key of this.target.getDynamicPropertyIds())
+            logicalKeys.add(key.replace(/:\d+$/, ""));
+
+        return Array.from(logicalKeys);
     }
 
     /**
