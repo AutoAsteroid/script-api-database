@@ -21,12 +21,9 @@ export default class Database {
     /**
      * Fetches the existence of a dynamic property in the dynamic properties of this instance. 
      * @param {string} name The dynamic property key name saved to check.
-     * @returns {boolean} Whether or not the database key exists in cache or exists at all.
+     * @returns {boolean} Whether or not the database key value exists.
      */
     has(name) {
-        // O(1) check if the dynamic property name already exists in cache
-        if (name in this.cache) return this.cache[name] !== undefined;
-
         // Check the base property and partitioned chunk zero for existence
         if (this.target.getDynamicProperty(name) !== undefined) return true;
         return this.target.getDynamicProperty(name + ":0") !== undefined;
@@ -146,30 +143,18 @@ export default class Database {
 }
 
 /**
- * Attach a self-overwriting lazy getter to Entity and World prototypes for seamless usage:
+ * Attach database getters to Entity and World prototypes for seamless usage across the codebase.
+ * Player extends Entity, so Player automatically get access to `.database` and `.db` too.
  */
+const DATABASE_KEY = Symbol("DatabaseInstance");
 
-for (const Prototype of [ Entity.prototype, World.prototype ]) {
-    /**
-     * Laxy initialization and instance overwrite (Runs ONLY ONCE per object instance)
-     * First access instantiates the Database that is reused for all future access.
-     */
+for (const Prototype of [ Entity.prototype, World.prototype ]) {    
+    // Define the 'database' property getter on Bedrock's native Entity or World prototype
     Object.defineProperty(Prototype, "database", {
         get() {
-            const database = new Database(this);
-
-            // Overwrite "database" on THIS INSTANCE with the static class instance
-            Object.defineProperty(this, "database", {
-                value: database,
-                writable: false,
-                enumerable: false,
-                configurable: false
-            });
-
-            return database;
+            return this[DATABASE_KEY] ??= new Database(this);
         },
-        // Allows the prototype getter to be overwritten by the instance above
-        configurable: true,
+        configurable: false,
         enumerable: false
     });
 
@@ -196,9 +181,9 @@ for (const Prototype of [ Entity.prototype, World.prototype ]) {
 
 // Eviction policy for cache when entities are removed from the server to not leak memory
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-    delete DATABASE_CACHE[playerId]
+    delete DATABASE_CACHE[playerId];
 });
 
 world.afterEvents.entityRemove.subscribe(({ removedEntityId }) => {
-    delete DATABASE_CACHE[removedEntityId]
+    delete DATABASE_CACHE[removedEntityId];
 });

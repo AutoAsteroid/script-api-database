@@ -1,6 +1,6 @@
 # 💾 Script API Database
 
-A high-performance, light-memory dynamic property database and scoreboard wrapper for Minecraft Bedrock's Script API (`@minecraft/server`). Built with zero-copy payload chunking, self-overwriting lazy getters, offline scoreboard cross-mapping, and automated JSON serialization. Packed with an additional external local JSON file database written in Go using `@minecraft/server-net`.
+A high-performance, light-memory dynamic property database and scoreboard wrapper for Minecraft Bedrock's Script API (`@minecraft/server`). Built with zero-copy payload chunking, property prototyping, offline scoreboard cross-mapping, and automated JSON serialization. Packed with an additional external local JSON file database written in Go using `@minecraft/server-net`.
 
 ---
 
@@ -12,7 +12,7 @@ A high-performance, light-memory dynamic property database and scoreboard wrappe
 | **Memory Caching** | Stores parsed database values and scoreboard objectives in cached memory (`DATABASE_CACHE` & `OBJECTIVE_CACHE`) for $O(1)$ access speed. |
 | **JSON Serialization** | Native stringify/parse handling that safely supports complex objects, arrays, numbers, floats, booleans, and values like `null`. |
 | **Offline Player Scoreboards** | Implements a relational identity bridge (`#USERNAMES_MAP` & `#SCOREBOARD_ID`) to get and modify player scoreboards by username, even if they are offline. |
-| **Seamless Prototype Binding** | Uses self-overwriting prototype accessors (`world.database`, `entity.database`, `entity.scores`) to attach directly to class instances on first access. |
+| **Seamless Prototype Binding** | Defines prototype accessors (`world.database`, `entity.database`, `entity.scores`) to attach directly to class instances for seamless usage. |
 | **External JSON Files** | Allows storing data outside the Bedrock Scripting API environment in local JSON files for cold or persistent storage via Go. |
 
 ## 📦 Installation & Usage

@@ -25,7 +25,7 @@ export default class Database {
     /**
      * Fetches the existence of a dynamic property in the dynamic properties of this instance.
      * @param name The dynamic property key name saved to check.
-     * @returns Whether or not the database key exists in cache or exists at all.
+     * @returns Whether or not the database key value exists.
      */
     has(name: string): boolean;
 
