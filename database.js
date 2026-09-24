@@ -24,6 +24,9 @@ export default class Database {
      * @returns {boolean} Whether or not the database key value exists.
      */
     has(name) {
+        // Check if the key exists in cache before doing any native calls
+        if (name in this.cache) return this.cache[name] !== undefined;
+
         // Check the base property and partitioned chunk zero for existence
         if (this.target.getDynamicProperty(name) !== undefined) return true;
         return this.target.getDynamicProperty(name + ":0") !== undefined;
@@ -97,7 +100,7 @@ export default class Database {
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
      * @param {string} name The dynamic property key name saved to delete.
-     * @returns {number} Number of associated dynammic property keys that were deleted.
+     * @returns {number} Number of associated dynamic property keys that were deleted.
      */
     delete(name) {
         const updates = {};

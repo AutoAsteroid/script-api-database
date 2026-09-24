@@ -49,7 +49,7 @@ export default class Database {
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
      * @param name The dynamic property key name saved to delete.
-     * @returns Number of associated dynammic property keys that were deleted.
+     * @returns Number of associated dynamic property keys that were deleted.
      */
     delete(name: string): number;
 

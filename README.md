@@ -45,10 +45,10 @@ import "./path/to/external-db.js";
 ## 📖 API Reference
 
 ### Dynamic Properties (`world.database` / `entity.database`)
-* **`.get(name, initial = {})`** : `any` — Reads a dynamic property from cache or reassembles it.
-* **`.set(name, data)`** : `any` — Serializes data to JSON and saves it (auto-chunks if >32,767 chars).
+* **`.get(name)`** : `any` — Reads a dynamic property from cache or reassembles it.
+* **`.set(name, data)`** : `number` — Serializes data to JSON and saves it (auto-chunks if >32,767 chars).
 * **`.has(name)`** : `boolean` — Checks if key exists in memory cache or native dynamic properties.
-* **`.delete(name)`** : `boolean` — Removes key and all associated chunk partitions from storage and cache.
+* **`.delete(name)`** : `number` — Removes key and all associated chunk partitions from storage and cache.
 * **`.keys()`** : `string[]` — Returns an array of all dynamic property keys stored on the target.
 * **`.size()`** : `number` — Returns total byte footprint of all properties on the target.
 
