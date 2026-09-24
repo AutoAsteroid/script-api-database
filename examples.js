@@ -31,8 +31,7 @@ if (!player.database.has("ranks")) {
     player.database.set("ranks", [ "Member" ]);
 }
 
-// Equivalent short hand to the above code if !has() then set()
-const ranks = player.database.get("ranks", [ "Member" ]);
+const ranks = player.database.get("ranks");
 
 /**
  * MANIPULATING EXISTING DATABASE OBJECTS
@@ -41,9 +40,8 @@ const ranks = player.database.get("ranks", [ "Member" ]);
  */
 
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
-    // {} lets the database know to store an object if its undefined
-    // You can omit it if you know it is guaranteed to be an object
-    const stats = deadEntity.database.get("stats", {});
+    // This assumes that "stats" is initialized and has "deaths" and "elo" keys
+    const stats = deadEntity.database.get("stats");
 
     stats.deaths += 1;
     stats.elo -= 10;
@@ -76,8 +74,8 @@ console.warn(retrieved.length); // 100000
  */
 
 // Batch deletes base key + all chunks in 1 native call
-world.database.delete("data"); // true
-world.database.delete("data"); // false
+world.database.delete("data"); // Math.ceil(100000 / 32767)
+world.database.delete("data"); // 0
 
 console.warn(world.database.keys()); // String array of property IDs
 console.warn(world.database.size()); // Total byte count used on target

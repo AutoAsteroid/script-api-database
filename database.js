@@ -32,12 +32,11 @@ export default class Database {
     /**
      * Gets a saved dynamic property from cache and loads it into cache if it is not cached yet.
      * @param {string} name The dynamic property key name saved to get.
-     * @param {any} [initial={}] Optional value to instantiate the database to if its undefined.
-     * @returns {any} The cached database value or parsed dynamic property value.
+     * @returns {any} The parsed dynamic property value. Undefined if the key doesn't exist.
      */
-    get(name, initial = {}) {
+    get(name) {
         // Get the parsed property directly from memory if it is already cached
-        if (this.cache[name] !== undefined) return this.cache[name];
+        if (name in this.cache) return this.cache[name];
 
         // Return the base key if it exists (raw is <= 32767 characters)
         const rawString = this.target.getDynamicProperty(name);
@@ -55,19 +54,19 @@ export default class Database {
         if (fullString.length)
             return this.cache[name] = JSON.parse(fullString);
 
-        // Fallback to initial if the dynamic property does not exist anywhere
-        return this.cache[name] = initial;
+        // Fallback and let the cache know that this key does not exist
+        return this.cache[name] = undefined;
     }
 
     /**
      * Saves a dynamic property to world and save it into the cache for later direct access.
      * @param {string} name The dynamic property key name saved to save.
-     * @param {object|array|string|number|boolean|undefined} data Data to save to world.
-     * @returns {any} Returns whatever value was passed into the data parameter directly.
+     * @param {any} data Data to save to world.
+     * @returns {number} The number of associated dynamic property keys modified.
      */
     set(name, data) {
-        // Early delete instead if data was passed as undefined or null (returns bool)
-        if (data === undefined || data === null) return this.delete(name); 
+        // Early delete if data was passed as undefined (returns number deleted keys)
+        if (data === undefined || data === null) return this.delete(name);
 
         const serialized = JSON.stringify(data);
         const updates = {};
@@ -89,34 +88,37 @@ export default class Database {
             updates[key] = serialized.slice(i, i + 32767);
         }
         
-        // Single native call into Bedrock C++ engine
+        // Single native call into Bedrock C++ engine updating all related keys
         this.target.setDynamicProperties(updates);
-        return this.cache[name] = data;
+
+        return Object.keys(updates).length;
     }
 
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
      * @param {string} name The dynamic property key name saved to delete.
-     * @returns {boolean} Whether or not the database dynamic property existed to delete.
+     * @returns {number} Number of associated dynammic property keys that were deleted.
      */
     delete(name) {
         const updates = {};
         const prefix = name + ":";
-        let existed = false;
+        let deleteCount = 0;
 
         // Deletes any base keys or partitioned string chunks if they exist
         for (const key of this.target.getDynamicPropertyIds()) {
             if (key === name || key.startsWith(prefix)) {
                 updates[key] = undefined;
-                existed = true;
+                deleteCount += 1;
             }
         }
         // Early return if we couldn't find any keys that matched name
-        if (existed === false) return false;
+        if (deleteCount === 0) return 0;
 
+        // Single native call into Bedrock C++ engine updating all related keys
         this.target.setDynamicProperties(updates);
         delete this.cache[name];
-        return true;
+
+        return deleteCount;
     }
 
     /**

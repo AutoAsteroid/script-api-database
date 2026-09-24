@@ -31,7 +31,7 @@ import "./path/to/scoreboard.js";
 If you would like access to cold or persistent storage saved outside the Script API environment, you must build and run the high performance Go bridge. You should use `systemd` or equivalent methods to keep this program running.
 
 ```bash
-go build -o external-db main.go
+go build -o jsondb external-db.go
 ```
 
 After running the binary, paste the `external-db.js` file in your behavior pack `scripts/` and import it in your main entry file. You will then be able to access the external database with `system.database` calls.

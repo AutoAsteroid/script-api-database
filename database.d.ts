@@ -33,26 +33,25 @@ export default class Database {
      * Gets a saved dynamic property from cache and loads it into cache if it is not cached yet.
      * @template T Optional type hint for the returned data payload.
      * @param name The dynamic property key name saved to get.
-     * @param initial Optional value to instantiate the database to if it is undefined.
-     * @returns The cached database value or parsed dynamic property value.
+     * @returns The parsed dynamic property value. Undefined if the key doesn't exist.
      */
-    get<T = any>(name: string, initial?: T): T;
+    get<T = any>(name: string): T;
 
     /**
      * Saves a dynamic property to world and saves it into the cache for later direct access.
      * @template T The type of data being saved.
      * @param name The dynamic property key name saved to save.
      * @param data Data to save to world.
-     * @returns Returns whatever value was passed into the data parameter directly.
+     * @returns The number of associated dynamic property keys modified.
      */
-    set<T = any>(name: string, data: T): T;
+    set<T = any>(name: string, data: T): number;
 
     /**
      * Deletes a dynamic property key from the Minecraft world and database cache if it exists.
      * @param name The dynamic property key name saved to delete.
-     * @returns Whether or not the database dynamic property existed to delete.
+     * @returns Number of associated dynammic property keys that were deleted.
      */
-    delete(name: string): boolean;
+    delete(name: string): number;
 
     /**
      * Returns the available set of dynamic property identifiers that have been used on this instance.
